@@ -65,7 +65,7 @@ $(ISO_DIR):
 
 .PHONY: test clean
 
-test: $(LIMINE_DIR) $(BIN_DIR)/txapela | $(ISO_DIR)
+test: $(LIMINE_DIR) $(BIN_DIR)/txapela | $(ISO_DIR) $(LOG_DIR)
 	mkdir -p $(ISO_DIR)/boot/limine
 	mkdir -p $(ISO_DIR)/EFI/BOOT
 	cp -v $(BIN_DIR)/txapela $(ISO_DIR)/boot
@@ -83,7 +83,10 @@ test: $(LIMINE_DIR) $(BIN_DIR)/txapela | $(ISO_DIR)
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISO_DIR) -o $(BIN_DIR)/txapela.iso
 	$(LIMINE_DIR)/limine bios-install $(BIN_DIR)/txapela.iso
-	qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso -m 2G
+	qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso -m 2G \
+		-chardev stdio,id=char0,logfile=$(LOG_DIR)/serial_com1.log,signal=off \
+		-serial chardev:char0
+	#bochs -qf $(CONF_DIR)/bochsrc.txt
 
 clean:
 	rm -rf $(LIMINE_DIR)
