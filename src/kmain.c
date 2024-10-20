@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include <limine.h>
+#include <ext/limine.h>
 
 __attribute__ ((used, section(".requests")))
 static volatile LIMINE_BASE_REVISION(2)

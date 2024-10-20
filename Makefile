@@ -6,24 +6,31 @@ OBJ_DIR=obj
 LOG_DIR=log
 ISO_DIR=iso
 CONF_DIR=conf
+CROSS_DIR=../toolchains/x86_64-elf/cross
+CROSS_PREFIX=$(CROSS_DIR)/bin/x86_64-elf-
+
+CC=$(CROSS_PREFIX)gcc
+CXX=$(CROSS_PREFIX)g++
+LD=$(CROSS_PREFIX)ld
+AS=$(CROSS_PREFIX)as
 
 CFLAGS = -ansi -Wall -Wextra -Wpedantic -Werror
 CFLAGS += -ffreestanding
-CFLAGS += -fno-stack-protector
-CFLAGS += -fno-stack-check
-CFLAGS += -fno-lto
-CFLAGS += -fno-PIC
-CFLAGS += -ffunction-sections
-CFLAGS += -fdata-sections
-CFLAGS += -I$(INC_DIR) -include $(LIMINE_DIR)/limine.h
-CFLAGS += -m64
-CFLAGS += -march=x86-64
-CFLAGS += -mno-80387
-CFLAGS += -mno-mmx
-CFLAGS += -mno-sse
-CFLAGS += -mno-sse2
-CFLAGS += -mno-red-zone
-CFLAGS += -mcmodel=kernel
+#CFLAGS += -fno-stack-protector
+#CFLAGS += -fno-stack-check
+#CFLAGS += -fno-lto
+#CFLAGS += -fno-PIC
+#CFLAGS += -ffunction-sections
+#CFLAGS += -fdata-sections
+CFLAGS += -I$(INC_DIR)
+#CFLAGS += -m64
+#CFLAGS += -march=x86-64
+#CFLAGS += -mno-80387
+#CFLAGS += -mno-mmx
+#CFLAGS += -mno-sse
+#CFLAGS += -mno-sse2
+#CFLAGS += -mno-red-zone
+#CFLAGS += -mcmodel=kernel
 
 LDFLAGS = -nostdlib
 LDFLAGS += -static

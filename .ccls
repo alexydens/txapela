@@ -1,5 +1,4 @@
 -Iinclude
--include limine/limine.h
 -ansi
 -Wall
 -Wextra
