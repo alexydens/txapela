@@ -1,2 +1,5 @@
 .ccls-cache
 limine
+bin
+obj
+iso
