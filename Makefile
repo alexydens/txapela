@@ -31,7 +31,7 @@ AS=$(CROSS_PREFIX)as
 
 # C COMILATION FLAGS
 # Warnings and standard
-CFLAGS = -ansi -Wall -Wextra -Wpedantic -Werror
+CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -Werror -Wno-unused
 # Includes
 CFLAGS += -I$(INC_DIR)
 # Free standing

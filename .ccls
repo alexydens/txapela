@@ -1,6 +1,6 @@
--Iinclude
--ansi
+-std=c11
 -Wall
 -Wextra
 -Wpedantic
 -Werror
+-Iinclude

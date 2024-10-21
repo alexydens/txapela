@@ -14,6 +14,13 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+/*
+ * I (https://github.com/alexydens) have edited this file. For the original
+ * version of this file, as written by the team behind the limine bootloader
+ * and protocol, please go to:
+ * https://github.com/limine-bootloader/limine/blob/v8.x/limine.h
+ */
+
 #ifndef LIMINE_H
 #define LIMINE_H 1
 
@@ -46,14 +53,14 @@ extern "C" {
 
 #define LIMINE_REQUESTS_START_MARKER \
     uint64_t limine_requests_start_marker[4] = { 0xf6b8f4b39de7d1ae, 0xfab91a6940fcb9cf, \
-                                                 0x785c6ed015d3e316, 0x181e920a7852b9d9 };
+                                                 0x785c6ed015d3e316, 0x181e920a7852b9d9 }
 #define LIMINE_REQUESTS_END_MARKER \
-    uint64_t limine_requests_end_marker[2] = { 0xadc0e0531bb10d03, 0x9572709f31764c62 };
+    uint64_t limine_requests_end_marker[2] = { 0xadc0e0531bb10d03, 0x9572709f31764c62 }
 
 #define LIMINE_REQUESTS_DELIMITER LIMINE_REQUESTS_END_MARKER
 
 #define LIMINE_BASE_REVISION(N) \
-    uint64_t limine_base_revision[3] = { 0xf9562b2d5c95a6c8, 0x6a7b384944536bdc, (N) };
+    uint64_t limine_base_revision[3] = { 0xf9562b2d5c95a6c8, 0x6a7b384944536bdc, (N) }
 
 #define LIMINE_BASE_REVISION_SUPPORTED (limine_base_revision[2] == 0)
 

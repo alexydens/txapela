@@ -2,7 +2,7 @@
 
 | Feature              | Type                          |
 | -------------------- | ----------------------------- |
-| Languages:           |ANSI C and AT&T assembly.      |
+| Languages:           |C11 and AT&T assembly.      |
 | Target architecture: |x86_64.                        |
 | Kernel type:         |Higher half kernel.            |
 | Bootloader:          |[Limine](https://github.com/limine-bootloader/limine).|
