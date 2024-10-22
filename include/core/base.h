@@ -122,7 +122,7 @@ typedef u64 size_t;
 
 /* FUNCTIONS REQUIRED BY COMPILER */
 /* Memset */
-static void *memset(void *dst, u8 val, size_t size) {
+static inline void *memset(void *dst, u8 val, size_t size) {
   size_t i;
   if (!dst) return NULL;
   if (!size) return dst;
@@ -130,7 +130,7 @@ static void *memset(void *dst, u8 val, size_t size) {
   return dst;
 }
 /* Memcpy */
-static void *memcpy(void *dst, const void *src, size_t size) {
+static inline void *memcpy(void *dst, const void *src, size_t size) {
   size_t i;
   if (!dst || !src) return NULL;
   if (!size) return dst;
@@ -138,14 +138,14 @@ static void *memcpy(void *dst, const void *src, size_t size) {
   return dst;
 }
 /* Strlen */
-static u32 strlen(const char *str) {
+static inline u32 strlen(const char *str) {
   size_t len = 0;
   if (!str) return 0;
   while (str[len]) len++;
   return len;
 }
 /* Memmove */
-static void *memmove(void *dest, const void *src, size_t n) {
+static inline void *memmove(void *dest, const void *src, size_t n) {
   u8 *pdest = (u8 *)dest;
   const u8 *psrc = (const u8 *)src;
   size_t i;
@@ -163,7 +163,7 @@ static void *memmove(void *dest, const void *src, size_t n) {
   return dest;
 }
 /* Memcmp */
-static int memcmp(const void *s1, const void *s2, size_t n) {
+static inline int memcmp(const void *s1, const void *s2, size_t n) {
   const u8 *p1 = (const u8 *)s1;
   const u8 *p2 = (const u8 *)s2;
   size_t i;

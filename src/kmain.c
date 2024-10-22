@@ -1,4 +1,5 @@
 #include <core/base.h>
+#include <io/serial.h>
 #include <ext/limine.h>
 
 __section(".requests")
@@ -22,6 +23,9 @@ void kmain(void) {
   size_t i;
   struct limine_framebuffer *fb;
 
+  serial_init(12);
+  serial_puts(SERIAL_PORT_COM1, "Test...\r\n");
+
   if (LIMINE_BASE_REVISION_SUPPORTED == false) {
     __asm__ __volatile__ ("hlt");
   }
@@ -34,7 +38,7 @@ void kmain(void) {
   fb = framebuffer_request.response->framebuffers[0];
 
   for (i = 0; i < 100; i++) {
-    volatile uint32_t *ptr = fb->address;
+    volatile u32 *ptr = fb->address;
     ptr[i * (fb->pitch / sizeof(uint32_t)) + i] = 0xffffffff;
   }
 
