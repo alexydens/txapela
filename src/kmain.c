@@ -47,7 +47,7 @@ void kmain(void) {
   tty_clear();
   tty_set_cursor(0, 0);
   tty_puts("Hello world!\r\n...");
-  tty_scale(1);
+  tty_scale(2);
   tty_puts("Hello world!\r\n...");
 
   __asm__ __volatile__ ("cli;hlt");

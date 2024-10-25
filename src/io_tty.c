@@ -34,12 +34,12 @@ static inline void render_buff(void) {
           ptr[
             x + (i % columns) * pixels_per_char
             + (y + (i / columns) * pixels_per_char) * _fb->width
-          ] = 0xFFFFFF;
+          ] = cursor == i ? 0x00000000 : 0xFFFFFFFF;
         } else {
           ptr[
             x + (i % columns) * pixels_per_char
             + (y + (i / columns) * pixels_per_char) * _fb->width
-          ] = 0x000000;
+          ] = cursor == i ? 0xFFFFFFFF : 0x00000000;
         }
       }
     }
