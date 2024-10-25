@@ -46,6 +46,18 @@ _Static_assert(sizeof(bool) == 1, "bool should be 1 byte");
 /* --- TYPE ALIASES AND STRUCTS --- */
 /* Size type */
 typedef u64 size_t;
+/* A framebuffer structure */
+struct framebuffer {
+  void *ptr;
+  size_t width;
+  size_t height;
+  size_t bpp;
+};
+/* A generic buffer structure */
+struct buffer {
+  void *ptr;
+  size_t size;
+};
 
 /* --- ATTRIBUTES --- */
 /* Packed structs are always stored how they are written */

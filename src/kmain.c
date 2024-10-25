@@ -1,6 +1,7 @@
 #include <core/base.h>
-#include <io/serial.h>
+//#include <ext/font8x8.h>
 #include <ext/limine.h>
+#include <io/tty.h>
 
 __section(".requests")
 static volatile LIMINE_BASE_REVISION(2);
@@ -20,11 +21,7 @@ __section(".requests_end")
 static volatile LIMINE_REQUESTS_END_MARKER;
 
 void kmain(void) {
-  size_t i;
   struct limine_framebuffer *fb;
-
-  serial_init(12);
-  serial_puts(SERIAL_PORT_COM1, "Test...\r\n");
 
   if (LIMINE_BASE_REVISION_SUPPORTED == false) {
     __asm__ __volatile__ ("hlt");
@@ -36,11 +33,22 @@ void kmain(void) {
   }
 
   fb = framebuffer_request.response->framebuffers[0];
+  struct framebuffer framebuffer = {
+    .ptr = fb->address,
+    .width = fb->width,
+    .height = fb->height,
+    .bpp = fb->bpp
+  };
 
-  for (i = 0; i < 100; i++) {
-    volatile u32 *ptr = fb->address;
-    ptr[i * (fb->pitch / sizeof(uint32_t)) + i] = 0xffffffff;
+  if (!tty_init(&framebuffer, 2)) {
+    __asm__ __volatile__ ("hlt");
   }
+
+  tty_clear();
+  tty_set_cursor(0, 0);
+  tty_puts("Hello world!\r\n...");
+  tty_scale(1);
+  tty_puts("Hello world!\r\n...");
 
   __asm__ __volatile__ ("cli;hlt");
 }

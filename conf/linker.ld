@@ -38,10 +38,5 @@ SECTIONS
   .bss : {
     *(.bss .bss.*)
     *(COMMON)
-  } :bss
-
-  /DISCARD/ : {
-    *(.eh_frame*)
-    *(.note .note.*)
-  }
+  } :data
 }
