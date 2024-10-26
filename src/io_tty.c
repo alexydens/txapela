@@ -6,9 +6,13 @@
 //#define pixels_per_char     16
 //#define pixels_per_char     8
 /* The maximum number of columns */
-#define MAX_COLUMNS         128
+#define MAX_COLUMNS         96
 /* The maximum number of rows */
 #define MAX_ROWS            64
+/* The background color */
+#define COL_BACKGROUND      0x00000077
+/* The foreground color */
+#define COL_FOREGROUND      0x00FFFFFF
 
 /* Globals */
 static struct framebuffer *_fb;
@@ -34,12 +38,12 @@ void _tty_refresh(void) {
           ptr[
             x + (i % columns) * pixels_per_char
             + (y + (i / columns) * pixels_per_char) * _fb->width
-          ] = cursor == i ? 0x00000000 : 0xFFFFFFFF;
+          ] = cursor == i ? COL_BACKGROUND : COL_FOREGROUND;
         } else {
           ptr[
             x + (i % columns) * pixels_per_char
             + (y + (i / columns) * pixels_per_char) * _fb->width
-          ] = cursor == i ? 0xFFFFFFFF : 0x00000000;
+          ] = cursor == i ? COL_FOREGROUND : COL_BACKGROUND;
         }
       }
     }

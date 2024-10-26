@@ -42,7 +42,7 @@ void kmain(void) {
   };
 
   /* Initialize TTY */
-  if (!tty_init(&framebuffer, 2)) {
+  if (!tty_init(&framebuffer, 1)) {
     __asm__ __volatile__ ("hlt");
   }
   tty_clear();
