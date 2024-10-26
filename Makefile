@@ -123,10 +123,10 @@ test: $(LIMINE_DIR) $(BIN_DIR)/txapela | $(ISO_DIR) $(LOG_DIR)
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISO_DIR) -o $(BIN_DIR)/txapela.iso
 	$(LIMINE_DIR)/limine bios-install $(BIN_DIR)/txapela.iso
-	qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso -m 2G \
-		-chardev stdio,id=char0,logfile=$(LOG_DIR)/serial_com1.log,signal=off \
-		-serial chardev:char0
-	#bochs -qf $(CONF_DIR)/bochsrc.txt
+	#qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso -m 2G \
+		#-chardev stdio,id=char0,logfile=$(LOG_DIR)/serial_com1.log,signal=off \
+		#-serial chardev:char0
+	../toolchains/bochs-x86_64/bochs-2.8/bochs -qf $(CONF_DIR)/bochsrc.txt
 
 # Tidy up
 clean:
