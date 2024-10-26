@@ -20,7 +20,7 @@ static size_t scale = 0;
 static char charbuf[MAX_COLUMNS * MAX_ROWS];
 
 /* Re-render the TTY */
-static inline void render_buff(void) {
+void _tty_refresh(void) {
   size_t i;
   for (i = 0; i < rows * columns; i++) {
     char c = charbuf[i];
@@ -47,7 +47,7 @@ static inline void render_buff(void) {
 }
 
 /* Put a character without updating TTY */
-static inline void _putc(char c) {
+void _tty_putc_norefresh(char c) {
   if (cursor >= columns * rows) {
     cursor = columns * (rows - 1);
     memcpy(charbuf, charbuf + columns, columns * (rows - 1));
@@ -97,28 +97,28 @@ void tty_scale(size_t scale_up) {
   memset(charbuf, 0, sizeof(charbuf));
 
   /* Re-draw */
-  render_buff();
+  _tty_refresh();
 }
 
 /* Print a character to the TTY */
-void tty_putc(char c) {
-  _putc(c);
-  render_buff();
+void tty_tty_putc_norefresh(char c) {
+  _tty_putc_norefresh(c);
+  _tty_refresh();
 }
 /* Print a string to the TTY */
 void tty_puts(const char *str) {
   while (*str) {
-    _putc(*str);
+    _tty_putc_norefresh(*str);
     str++;
   }
-  render_buff();
+  _tty_refresh();
 }
 
 /* Clear the TTY screen */
 void tty_clear(void) {
   cursor = 0;
   memset(charbuf, 0, sizeof(charbuf));
-  render_buff();
+  _tty_refresh();
 }
 /* Set the cursor position of the TTY */
 void tty_set_cursor(size_t x, size_t y) {

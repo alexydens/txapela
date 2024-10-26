@@ -1,5 +1,6 @@
-#include <core/base.h>
 #include <ext/limine.h>
+#include <core/base.h>
+#include <core/printf.h>
 #include <io/tty.h>
 #include <sys/segmentation.h>
 
@@ -46,12 +47,17 @@ void kmain(void) {
   }
   tty_clear();
   tty_set_cursor(0, 0);
-  tty_puts("===> Initialized TTY\r\n");
+  tty_printf("===> Initialized TTY\r\n");
   /* Initialize segmentation */
   if (!segmentation_init()) {
     __asm__ __volatile__ ("hlt");
   }
-  tty_puts("===> Initialized segmentation\r\n");
+  tty_printf("===> Initialized segmentation\r\n");
+  tty_printf("     - KERNEL CODE SEGMENT: 0x%04x\r\n", SEGMENT_KERNEL_CODE);
+  tty_printf("     - KERNEL DATA SEGMENT: 0x%04x\r\n", SEGMENT_KERNEL_DATA);
+  tty_printf("     - USER CODE SEGMENT:   0x%04x\r\n", SEGMENT_USER_CODE);
+  tty_printf("     - USER DATA SEGMENT:   0x%04x\r\n", SEGMENT_USER_DATA);
+  tty_printf("     - TASK STATE SEGMENT:  0x%04x\r\n", SEGMENT_TSS);
 
   __asm__ __volatile__ ("cli;hlt");
 }
