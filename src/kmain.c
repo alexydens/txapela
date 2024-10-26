@@ -1,26 +1,31 @@
+/* Includes */
 #include <ext/limine.h>
 #include <core/base.h>
 #include <core/printf.h>
 #include <io/tty.h>
 #include <sys/segmentation.h>
+#include <sys/interrupts.h>
 
+/* The requests start marker */
+__section(".requests_start")
+static volatile LIMINE_REQUESTS_START_MARKER;
+
+/* The base revision request */
 __section(".requests")
 static volatile LIMINE_BASE_REVISION(2);
-
+/* The framebuffer request */
 __section(".requests")
 static volatile struct limine_framebuffer_request framebuffer_request = {
-  //LIMINE_FRAMEBUFFER_REQUEST, 0, NULL
   .id = LIMINE_FRAMEBUFFER_REQUEST,
   .revision = 0,
   .response = NULL
 };
 
-__section(".requests_start")
-static volatile LIMINE_REQUESTS_START_MARKER;
-
+/* The requests end marker */
 __section(".requests_end")
 static volatile LIMINE_REQUESTS_END_MARKER;
 
+/* Entry point for kernel */
 void kmain(void) {
   /* Check support */
   if (LIMINE_BASE_REVISION_SUPPORTED == false) {
@@ -58,6 +63,11 @@ void kmain(void) {
   tty_printf("     - USER CODE SEGMENT:   0x%04x\r\n", SEGMENT_USER_CODE);
   tty_printf("     - USER DATA SEGMENT:   0x%04x\r\n", SEGMENT_USER_DATA);
   tty_printf("     - TASK STATE SEGMENT:  0x%04x\r\n", SEGMENT_TSS);
+  /* Initialize interrupts */
+  if (!interrupts_init())
+    __asm__ __volatile__ ("hlt");
+  tty_printf("===> Initialized interrupts\r\n");
+  __asm__ __volatile__ ("int $0x3");
 
   __asm__ __volatile__ ("cli;hlt");
 }

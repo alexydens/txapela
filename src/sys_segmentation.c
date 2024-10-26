@@ -12,11 +12,11 @@ static struct gdt_entry {
   u8 base_high;
   u32 base_upper;
   u32 reserved;
-} __packed gdt_entries[6] __aligned(8);
+} __packed gdt_entries[6] __aligned(0x10);
 static struct gdtr {
   u16 limit;
   u64 base;
-} __packed gdtr __aligned(8);
+} __packed gdtr __aligned(0x10);
 static struct tss {
   u32 reserved0;          /* Reserved (0x00) */
   u64 rsp0;               /* Stack pointer for Ring 0 (0x04) */
@@ -33,7 +33,7 @@ static struct tss {
   u64 reserved2;          /* Reserved (0x58) */
   u16 reserved3;          /* Reserved (0x60) */
   u16 io_map_base;        /* I/O map base address (0x62) */
-} __packed tss __aligned(8);
+} __packed tss __aligned(0x10);
 
 /* Set a GDT entry */
 static inline void set_gdt_entry(
