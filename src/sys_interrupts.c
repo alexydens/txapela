@@ -53,7 +53,7 @@ static inline void set_idt_entry(
     u8 attributes
 ) {
   idt_entries[index].offset_low    = (u16)base;
-  idt_entries[index].segment       = (u16)selector;
+  idt_entries[index].segment       = selector;
   idt_entries[index].ist           = ist;
   idt_entries[index].attributes    = attributes;
   idt_entries[index].offset_middle = (u16)(base >> 16) & 0xFF;
@@ -66,7 +66,14 @@ static inline void set_idt_entry(
     0, 0x8E)
 
 /* The common exception handler */
-void isr_handler_common(void *args) {
+struct isr_args {
+  u64 interrupt_number;
+  u64 r15, r14, r13, r12, r11, r10, r9, r8;
+  u64 rbp, rdi, rsi, rdx, rcx, rbx, rax;
+  u64 error_code;
+  u64 rip, cs, rflags, rsp, ss;
+} __packed;
+void isr_handler_common(struct isr_args *args) {
   tty_printf("EXCEPTION\r\n");
   (void)args;
 }
@@ -117,11 +124,8 @@ bool interrupts_init(void) {
   /* Set all data to NULL */
   memset(interrupt_data, 0, sizeof(interrupt_data));
 
-  /* Disable the PIC */
-  port_outb(0x21, 0xFF);
-  port_outb(0xA1, 0xFF);
-
   /* Set all exceptions */
+  memset(idt_entries, 0, sizeof(idt_entries));
   SET_EXCEPTION_ENTRY(0);
   SET_EXCEPTION_ENTRY(1);
   SET_EXCEPTION_ENTRY(2);
@@ -156,11 +160,21 @@ bool interrupts_init(void) {
   SET_EXCEPTION_ENTRY(31);
 
   /* Set the IDTR */
-  idtr.limit = (u16)ARRLEN(idt_entries) - 1;
+  idtr.limit = (u16)sizeof(idt_entries) - 1;
   idtr.base = (u64)idt_entries;
 
   /* Load the IDT */
   __asm__ __volatile__ ("lidt %0" : : "m"(idtr));
+  /* Long jump */
+  __asm__ __volatile__ (
+      "push $0x0010\n\t"
+      "leaq 1f(%rip), %rax\n\t"
+      "push %rax\n\t"
+      "lretq\n\t"
+      "1:"
+  );
+  /* Enable interrupts */
+  __asm__ __volatile__ ("sti");
 
   return true;
 }

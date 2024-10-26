@@ -1,3 +1,4 @@
+.code64
 .macro push_regs
   pushq %r15
   pushq %r14
@@ -35,32 +36,38 @@
 .endm
 
 .extern isr_handler_common
+
 .macro isr_noerr index
   .global _isr_\index
   .type _isr_\index, @function
-  .align 4
+  .align 8
   _isr_\index:
     pushq $0
+    pushq $\index
     push_regs
-    movq $\index, %rdi
-    pushq %rdi
+
+    movq %rsp, %rdi
+
     call isr_handler_common
+    
     pop_regs
-    popq %rdi
-    addq $8, %rsp
+    addq $16, %rsp
     iretq
   .size _isr_\index, .-_isr_\index
 .endm
+
 .macro isr_err index
   .global _isr_\index
   .type _isr_\index, @function
-  .align 4
+  .align 8
   _isr_\index:
+    pushq $\index
     push_regs
-    movq $\index, %rdi
-    pushq %rdi
+
+    movq %rsp, %rdi
+
     call isr_handler_common
-    popq %rdi
+
     pop_regs
     addq $8, %rsp
     iretq
@@ -99,4 +106,3 @@ isr_noerr 28
 isr_noerr 29
 isr_noerr 30
 isr_noerr 31
-

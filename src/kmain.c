@@ -64,10 +64,13 @@ void kmain(void) {
   tty_printf("     - USER DATA SEGMENT:   0x%04x\r\n", SEGMENT_USER_DATA);
   tty_printf("     - TASK STATE SEGMENT:  0x%04x\r\n", SEGMENT_TSS);
   /* Initialize interrupts */
-  if (!interrupts_init())
+  if (!interrupts_init()) {
     __asm__ __volatile__ ("hlt");
+  }
   tty_printf("===> Initialized interrupts\r\n");
-  __asm__ __volatile__ ("int $0x3");
+  __asm__ __volatile__ ("xchg %bx,%bx");
+  __asm__ __volatile__ ("int $0x03");
 
+  while (1);
   __asm__ __volatile__ ("cli;hlt");
 }
