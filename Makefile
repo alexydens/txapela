@@ -46,7 +46,6 @@ CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -mno-80387
 # No SIMD
 #CFLAGS += -mno-mmx -mno-sse -mno-sse2
-CFLAGS += -mno-mmx
 # No red zone (area above stack for GCC)
 CFLAGS += -mno-red-zone
 # Higher half kernel memory model

@@ -8,10 +8,7 @@
 #include <ext/font8x8.h>
 
 /* Initialize basic TTY */
-extern bool tty_init(struct framebuffer *fb, size_t scale_up);
-
-/* Change TTY scale */
-extern void tty_scale(size_t scale_up);
+extern bool tty_init(struct framebuffer *fb);
 
 /* Print a character to the TTY */
 extern void tty_putc(char c);
@@ -23,15 +20,9 @@ extern void tty_clear(void);
 /* Set the cursor position of the TTY */
 extern void tty_set_cursor(size_t x, size_t y);
 
-/* Put a character to the TTY buffer, but don't re-draw */
-extern void _tty_putc_norefresh(char c);
-/* Re-render the TTY */
-extern void _tty_refresh(void);
-
 /* Print formatted output to the TTY */
 #define tty_printf(...) do{ \
-  _printf(_tty_putc_norefresh, ##__VA_ARGS__); \
-  _tty_refresh();\
-  } while (0)\
+  _printf(tty_putc, ##__VA_ARGS__); \
+  } while (0)
 
 #endif /* TX_IO_TTY_H */

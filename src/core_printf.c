@@ -240,7 +240,8 @@ void _printf(void (*_putc)(char), const char *format, ...) {
         case 'f':
           ptr++;
           /* Print float */
-          arg.real = va_arg(args, f64);
+          //arg.real = va_arg(args, f64);
+          arg.uint = va_arg(args, int);
           _printf(_putc, "%s", "FLOATS NOT IMPLEMENTED");
           break;
         case 'c':

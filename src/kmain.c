@@ -3,6 +3,7 @@
 #include <core/base.h>
 #include <core/printf.h>
 #include <io/tty.h>
+#include <sys/sse.h>
 #include <sys/segmentation.h>
 #include <sys/interrupts.h>
 
@@ -60,27 +61,32 @@ void kmain(void) {
     .bpp = fb->bpp
   };
 
+  /* Enable SSE */
+  if (!sse_init()) {
+    __asm__ __volatile__ ("hlt");
+  }
+
   /* Initialize TTY */
-  if (!tty_init(&framebuffer, 1)) {
+  if (!tty_init(&framebuffer)) {
     __asm__ __volatile__ ("hlt");
   }
   tty_clear();
   tty_set_cursor(0, 0);
   tty_printf("===> Initialized TTY\r\n");
-  /* Print boot information */
-  tty_printf("     - BOOTLOADER: %s (ver %s)\r\n", 
+  tty_printf("     - BOOTLOADER:          %s (ver %s)\r\n", 
     bootloader_info_request.response->name,
     bootloader_info_request.response->version
   );
+  /* Print boot information */
   switch (firmware_type_request.response->firmware_type) {
     case LIMINE_FIRMWARE_TYPE_X86BIOS:
-      tty_printf("     - FIRMWARE TYPE: x86 BIOS\r\n");
+      tty_printf("     - FIRMWARE TYPE:       x86 BIOS\r\n");
       break;
     case LIMINE_FIRMWARE_TYPE_UEFI32:
-      tty_printf("     - FIRMWARE TYPE: UEFI32\r\n");
+      tty_printf("     - FIRMWARE TYPE:       UEFI32\r\n");
       break;
     case LIMINE_FIRMWARE_TYPE_UEFI64:
-      tty_printf("     - FIRMWARE TYPE: UEFI64\r\n");
+      tty_printf("     - FIRMWARE TYPE:       UEFI64\r\n");
       break;
     default:
       tty_printf("     - UNRECOGNIZED FIRMWARE TYPE! HALTING...\r\n");
