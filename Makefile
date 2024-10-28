@@ -51,6 +51,8 @@ CFLAGS += -mno-mmx
 CFLAGS += -mno-red-zone
 # Higher half kernel memory model
 CFLAGS += -mcmodel=kernel
+# No optimisations
+CFLAGS += -O0
 
 # LINKER FLAGS
 # No standard library linked in (I don't think the cross compiler has one tho)

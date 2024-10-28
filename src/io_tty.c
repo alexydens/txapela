@@ -55,6 +55,7 @@ void _tty_putc_norefresh(char c) {
   if (cursor >= columns * rows) {
     cursor = columns * (rows - 1);
     memcpy(charbuf, charbuf + columns, columns * (rows - 1));
+    memset(charbuf + columns * (rows - 1), 0, columns);
   }
   switch (c) {
     case '\n':

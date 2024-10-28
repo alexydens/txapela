@@ -1,4 +1,4 @@
-.code64
+.section .text
 .macro push_regs
   pushq %r15
   pushq %r14
@@ -39,8 +39,8 @@
 
 .macro isr_noerr index
   .global _isr_\index
-  .type _isr_\index, @function
-  .align 8
+  //.type _isr_\index, @function
+  .align 0x10
   _isr_\index:
     pushq $0
     pushq $\index
@@ -58,8 +58,8 @@
 
 .macro isr_err index
   .global _isr_\index
-  .type _isr_\index, @function
-  .align 8
+  //.type _isr_\index, @function
+  .align 0x10
   _isr_\index:
     pushq $\index
     push_regs

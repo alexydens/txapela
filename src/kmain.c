@@ -68,7 +68,6 @@ void kmain(void) {
     __asm__ __volatile__ ("hlt");
   }
   tty_printf("===> Initialized interrupts\r\n");
-  __asm__ __volatile__ ("xchg %bx,%bx");
   __asm__ __volatile__ ("int $0x03");
 
   while (1);

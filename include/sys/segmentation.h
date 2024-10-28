@@ -16,7 +16,7 @@
 /* The user data segment */
 #define SEGMENT_USER_DATA   0x0043
 /* The task state segment */
-#define SEGMENT_TSS         0x0050
+#define SEGMENT_TSS         0x0053
 
 /* Initialize segmentation */
 extern bool segmentation_init(void);

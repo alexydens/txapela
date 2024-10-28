@@ -56,8 +56,9 @@ static inline void set_idt_entry(
   idt_entries[index].segment       = selector;
   idt_entries[index].ist           = ist;
   idt_entries[index].attributes    = attributes;
-  idt_entries[index].offset_middle = (u16)(base >> 16) & 0xFF;
+  idt_entries[index].offset_middle = (u16)(base >> 16) & 0xFFFF;
   idt_entries[index].offset_high   = (u32)(base >> 32) & 0xFFFFFFFF;
+  idt_entries[index].reserved      = 0;
 }
 #define SET_EXCEPTION_ENTRY(index) set_idt_entry(\
     index,\
@@ -67,15 +68,28 @@ static inline void set_idt_entry(
 
 /* The common exception handler */
 struct isr_args {
+  u64 rax, rbx, rcx, rdx, rsi, rdi, rbp, r8, r9, r10, r11, r12, r13, r14, r15;
   u64 interrupt_number;
-  u64 r15, r14, r13, r12, r11, r10, r9, r8;
-  u64 rbp, rdi, rsi, rdx, rcx, rbx, rax;
   u64 error_code;
   u64 rip, cs, rflags, rsp, ss;
 } __packed;
 void isr_handler_common(struct isr_args *args) {
-  tty_printf("EXCEPTION\r\n");
-  (void)args;
+  tty_printf(
+      "EXCEPTION %d (%s)\r\n",
+      args->interrupt_number,
+      interrupt_names[args->interrupt_number]
+  );
+  if (args->interrupt_number == 14) {
+    u64 cr2;
+    __asm__ __volatile__ ("mov %%cr2, %0" : "=r"(cr2));
+    tty_printf("CR2 = 0x%08x%08x\r\n", (u32)((u64)cr2 >> 32), (u32)((u64)cr2));
+    tty_printf(
+        "%s process tried to %s a %s page.\r\n",
+        args->error_code & 0x4 ? "User" : "Supervisor",
+        args->error_code & 0x2 ? "read" : "write",
+        args->error_code & 0x1 ? "present" : "non-present"
+    );
+  }
 }
 
 /* Interrupt service routines */
