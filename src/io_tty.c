@@ -50,6 +50,16 @@ void tty_putc(char c) {
     return;
   }
 
+  /* If cursor is out of bounds, move screen down, wipe last line */
+  if (cursor >= TTY_COLUMNS * TTY_ROWS) {
+    cursor -= TTY_COLUMNS;
+    memcpy(
+        _fb->ptr,
+        (u32*)_fb->ptr + (u32)(_fb->width * scale_y),
+        (u32)((TTY_ROWS-1) * _fb->width * scale_y) * sizeof(u32)
+    );
+  }
+
   /* Find position */
   size_t char_x = cursor % TTY_COLUMNS;
   size_t char_y = cursor / TTY_COLUMNS;
