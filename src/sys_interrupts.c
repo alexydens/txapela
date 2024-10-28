@@ -67,27 +67,17 @@ static inline void set_idt_entry(
     0, 0x8E)
 
 /* The common exception handler */
-struct isr_args {
-  u64 rax, rbx, rcx, rdx, rsi, rdi, rbp, r8, r9, r10, r11, r12, r13, r14, r15;
-  u64 interrupt_number;
-  u64 error_code;
-  u64 rip, cs, rflags, rsp, ss;
-} __packed;
 void isr_handler_common(struct isr_args *args) {
-  tty_printf(
-      "EXCEPTION %d (%s)\r\n",
-      args->interrupt_number,
-      interrupt_names[args->interrupt_number]
-  );
-  if (args->interrupt_number == 14) {
-    u64 cr2;
-    __asm__ __volatile__ ("mov %%cr2, %0" : "=r"(cr2));
-    tty_printf("CR2 = 0x%08x%08x\r\n", (u32)((u64)cr2 >> 32), (u32)((u64)cr2));
+  if (interrupt_handlers[args->interrupt_number])
+    interrupt_handlers[args->interrupt_number](
+      interrupt_data[args->interrupt_number],
+      args
+    );
+  else {
     tty_printf(
-        "%s process tried to %s a %s page.\r\n",
-        args->error_code & 0x4 ? "User" : "Supervisor",
-        args->error_code & 0x2 ? "read" : "write",
-        args->error_code & 0x1 ? "present" : "non-present"
+        "UNHANLDED EXCEPTION: %d (%s)\r\n",
+        args->interrupt_number,
+        interrupt_names[args->interrupt_number]
     );
   }
 }

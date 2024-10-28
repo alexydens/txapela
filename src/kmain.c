@@ -13,6 +13,20 @@ static volatile LIMINE_REQUESTS_START_MARKER;
 /* The base revision request */
 __section(".requests")
 static volatile LIMINE_BASE_REVISION(2);
+/* The bootloader info request */
+__section(".requests")
+static volatile struct limine_bootloader_info_request bootloader_info_request={
+  .id = LIMINE_BOOTLOADER_INFO_REQUEST,
+  .revision = 0,
+  .response = NULL
+};
+/* The firmware type request */
+__section(".requests")
+static volatile struct limine_firmware_type_request firmware_type_request = {
+  .id = LIMINE_FIRMWARE_TYPE_REQUEST,
+  .revision = 0,
+  .response = NULL
+};
 /* The framebuffer request */
 __section(".requests")
 static volatile struct limine_framebuffer_request framebuffer_request = {
@@ -53,6 +67,26 @@ void kmain(void) {
   tty_clear();
   tty_set_cursor(0, 0);
   tty_printf("===> Initialized TTY\r\n");
+  /* Print boot information */
+  tty_printf("     - BOOTLOADER: %s (ver %s)\r\n", 
+    bootloader_info_request.response->name,
+    bootloader_info_request.response->version
+  );
+  switch (firmware_type_request.response->firmware_type) {
+    case LIMINE_FIRMWARE_TYPE_X86BIOS:
+      tty_printf("     - FIRMWARE TYPE: x86 BIOS\r\n");
+      break;
+    case LIMINE_FIRMWARE_TYPE_UEFI32:
+      tty_printf("     - FIRMWARE TYPE: UEFI32\r\n");
+      break;
+    case LIMINE_FIRMWARE_TYPE_UEFI64:
+      tty_printf("     - FIRMWARE TYPE: UEFI64\r\n");
+      break;
+    default:
+      tty_printf("     - UNRECOGNIZED FIRMWARE TYPE! HALTING...\r\n");
+      __asm__ __volatile__ ("hlt");
+      break;
+  }
   /* Initialize segmentation */
   if (!segmentation_init()) {
     __asm__ __volatile__ ("hlt");
@@ -68,7 +102,6 @@ void kmain(void) {
     __asm__ __volatile__ ("hlt");
   }
   tty_printf("===> Initialized interrupts\r\n");
-  __asm__ __volatile__ ("int $0x03");
 
   while (1);
   __asm__ __volatile__ ("cli;hlt");
