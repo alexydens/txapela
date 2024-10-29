@@ -1,7 +1,7 @@
 /* Includes */
 #include <ext/limine.h>
 #include <core/base.h>
-#include <core/printf.h>
+#include <core/panic.h>
 #include <io/tty.h>
 #include <sys/sse.h>
 #include <sys/segmentation.h>
@@ -122,6 +122,8 @@ void kmain(void) {
     __asm__ __volatile__ ("hlt");
   }
   tty_printf("===> Initialized interrupts\r\n");
+
+  kpanic("Testing: %s", "kpanic()");
 
   while (1);
   __asm__ __volatile__ ("cli;hlt");
