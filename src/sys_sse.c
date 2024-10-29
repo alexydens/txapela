@@ -4,7 +4,19 @@
 /* Setup SSE */
 bool sse_init(void) {
   u64 cr0, cr4;
+  u32 eax, ebx, ecx, edx;
 
+  /* Check for support */
+  __asm__ __volatile__ (
+      "cpuid"
+      : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx)
+      : "a"(1)
+  );
+  if ((edx & (1 << 25)) == 0) {
+    return false;
+  }
+
+  /* Enable SSE */
   __asm__ __volatile__ (
       "mov %%cr0, %0\n\t"
       "and $~(1 << 2), %0\n\t"
@@ -19,6 +31,7 @@ bool sse_init(void) {
       : "=r"(cr4)
   );
 
+  /* Reset MXCSR */
   u32 mxcsr = 0x1F80;
   __asm__ __volatile__ ("ldmxcsr %0\n\t" : : "m"(mxcsr));
 

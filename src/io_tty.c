@@ -2,14 +2,23 @@
 #include <io/tty.h>
 
 /* Consts */
+#ifdef TX_TTY_NARROW_MONITOR
 /* The maximum number of columns */
 #define TTY_COLUMNS         128
 /* The maximum number of rows */
 #define TTY_ROWS            64
+#else
+/* The maximum number of columns */
+#define TTY_COLUMNS         192
+/* The maximum number of rows */
+#define TTY_ROWS            72
+#endif
 /* The background color */
-#define COL_BACKGROUND      0x00000077
+//#define COL_BACKGROUND      0x00000077
+#define COL_BACKGROUND      0x00001100
 /* The foreground color */
-#define COL_FOREGROUND      0x00FFFFFF
+//#define COL_FOREGROUND      0x00FFFFFF
+#define COL_FOREGROUND      0x0033FF33
 
 /* Globals */
 static struct framebuffer *_fb;

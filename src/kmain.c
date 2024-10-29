@@ -123,7 +123,7 @@ void kmain(void) {
   }
   tty_printf("===> Initialized interrupts\r\n");
 
-  kpanic("Testing: %s", "kpanic()");
+  kpanic("Oh dear! %d", 42);
 
   while (1);
   __asm__ __volatile__ ("cli;hlt");

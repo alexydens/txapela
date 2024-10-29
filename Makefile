@@ -105,9 +105,10 @@ $(ISO_DIR):
 	mkdir -p $@
 
 # Phony rules
-.PHONY: test clean
+.PHONY: test clean build
 
 # Build and test the bootloader
+test: CFLAGS += -DTX_TTY_NARROW_MONITOR
 test: $(LIMINE_DIR) $(BIN_DIR)/txapela | $(ISO_DIR) $(LOG_DIR)
 	mkdir -p $(ISO_DIR)/boot/limine
 	mkdir -p $(ISO_DIR)/EFI/BOOT
@@ -130,6 +131,26 @@ test: $(LIMINE_DIR) $(BIN_DIR)/txapela | $(ISO_DIR) $(LOG_DIR)
 		#-chardev stdio,id=char0,logfile=$(LOG_DIR)/serial_com1.log,signal=off \
 		#-serial chardev:char0
 	../toolchains/bochs-x86_64/bochs-2.8/bochs -qf $(CONF_DIR)/bochsrc.txt
+
+# Build the bootloader
+build: $(LIMINE_DIR) $(BIN_DIR)/txapela | $(ISO_DIR) $(LOG_DIR)
+	mkdir -p $(ISO_DIR)/boot/limine
+	mkdir -p $(ISO_DIR)/EFI/BOOT
+	cp -v $(BIN_DIR)/txapela $(ISO_DIR)/boot
+	cp -v $(CONF_DIR)/limine.conf $(ISO_DIR)/boot/limine
+	cp -v \
+		$(LIMINE_DIR)/limine-bios.sys    \
+		$(LIMINE_DIR)/limine-bios-cd.bin \
+		$(LIMINE_DIR)/limine-uefi-cd.bin \
+		$(ISO_DIR)/boot/limine
+	cp -v $(LIMINE_DIR)/BOOTX64.EFI $(ISO_DIR)/EFI/BOOT
+	cp -v $(LIMINE_DIR)/BOOTIA32.EFI $(ISO_DIR)/EFI/BOOT
+	xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin      \
+		-no-emul-boot -boot-load-size 4 -boot-info-table         \
+		--efi-boot boot/limine/limine-uefi-cd.bin                \
+		-efi-boot-part --efi-boot-image --protective-msdos-label \
+		$(ISO_DIR) -o $(BIN_DIR)/txapela.iso
+	$(LIMINE_DIR)/limine bios-install $(BIN_DIR)/txapela.iso
 
 # Tidy up
 clean:
