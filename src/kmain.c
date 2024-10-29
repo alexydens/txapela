@@ -53,13 +53,24 @@ void kmain(void) {
 
   /* Proccess framebuffer response */
   struct limine_framebuffer *fb;
-  fb = framebuffer_request.response->framebuffers[0];
-  struct framebuffer framebuffer = {
-    .ptr = fb->address,
-    .width = fb->width,
-    .height = fb->height,
-    .bpp = fb->bpp
-  };
+  struct framebuffer framebuffer;
+  for (
+      size_t i = 0;
+      i < framebuffer_request.response->framebuffer_count;
+      i++
+  ) {
+    fb = framebuffer_request.response->framebuffers[i];
+    if (fb->bpp == 32) {
+      framebuffer.ptr = fb->address;
+      framebuffer.width = fb->width;
+      framebuffer.height = fb->height;
+      framebuffer.bpp = fb->bpp;
+      break;
+    }
+  }
+  if (framebuffer.bpp != 32) {
+    __asm__ __volatile__ ("hlt");
+  }
 
   /* Enable SSE */
   if (!sse_init()) {
@@ -73,6 +84,9 @@ void kmain(void) {
   tty_clear();
   tty_set_cursor(0, 0);
   tty_printf("===> Initialized TTY\r\n");
+  tty_printf("     - FRAMEBUFFER WIDTH:   %u\r\n", framebuffer.width);
+  tty_printf("     - FRAMEBUFFER HEIGHT:  %u\r\n", framebuffer.height);
+  tty_printf("     - FRAMEBUFFER BPP:     %u\r\n", framebuffer.bpp);
   tty_printf("     - BOOTLOADER:          %s (ver %s)\r\n", 
     bootloader_info_request.response->name,
     bootloader_info_request.response->version
