@@ -15,10 +15,12 @@
 #endif
 /* The background color */
 //#define COL_BACKGROUND      0x00000077
-#define COL_BACKGROUND      0x00001100
+//#define COL_BACKGROUND      0x00001100
+#define COL_BACKGROUND      0x00000000
 /* The foreground color */
 //#define COL_FOREGROUND      0x00FFFFFF
-#define COL_FOREGROUND      0x0033FF33
+//#define COL_FOREGROUND      0x0033FF33
+#define COL_FOREGROUND      0x00FFFFFF
 
 /* Globals */
 static struct framebuffer *_fb;
