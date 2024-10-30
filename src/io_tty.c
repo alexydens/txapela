@@ -6,12 +6,12 @@
 /* The maximum number of columns */
 #define TTY_COLUMNS         128
 /* The maximum number of rows */
-#define TTY_ROWS            64
+#define TTY_ROWS            96
 #else
 /* The maximum number of columns */
-#define TTY_COLUMNS         192
+#define TTY_COLUMNS         240
 /* The maximum number of rows */
-#define TTY_ROWS            72
+#define TTY_ROWS            90
 #endif
 /* The background color */
 //#define COL_BACKGROUND      0x00000077
