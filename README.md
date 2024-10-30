@@ -1,4 +1,4 @@
-# Chapela, a kernel from scratch for x86_64 based systems
+# Txapela, a kernel from scratch for x86_64 based systems
 
 | Feature              | Type                          |
 | -------------------- | ----------------------------- |
