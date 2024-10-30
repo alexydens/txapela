@@ -82,5 +82,6 @@ void pfa_free_page(void *page) {
   size_t page_index = (u64)page / 0x1000;
   size_t i = page_index / sizeof(u32);
   size_t j = page_index % sizeof(u32);
+  if (i >= ARRLEN(bitmap)) return;
   bitmap[i] &= ~(1 << j);
 }
