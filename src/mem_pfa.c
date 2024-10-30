@@ -2,8 +2,8 @@
 #include <mem/pfa.h>
 
 /* Globals */
-/* Page frames limited to 0x00000000 - 0xffffffff */
-static u32 bitmap[0x100000000/sizeof(u32)];
+///* Page frames limited to 0x00000000 - 0xffffffff */
+static u32 bitmap[0x100000000/(0x1000*sizeof(u32))];
 
 /* Initialize page frame allocator */
 bool pfa_init(struct limine_memmap_entry **mmap, size_t mmap_size) {
@@ -29,10 +29,12 @@ bool pfa_init(struct limine_memmap_entry **mmap, size_t mmap_size) {
           tty_printf("(USABLE)\r\n");
 
           /* Mark area as free */
-          for (size_t j = 0; j < mmap[i]->length; j++) {
-            bitmap[
-              (mmap[i]->base/0x1000 + j) / sizeof(u32)
-            ] &= ~(1 << ((mmap[i]->base/0x1000 + j) % sizeof(u32)));
+          for (
+              u64 j = (u64)mmap[i]->base;
+              j < (u64)mmap[i]->base + mmap[i]->length;
+              j += 0x1000
+          ) {
+            pfa_free_page((void *)j);
           }
         } break;
       case LIMINE_MEMMAP_RESERVED:
@@ -63,11 +65,11 @@ bool pfa_init(struct limine_memmap_entry **mmap, size_t mmap_size) {
 
 /* Get a free page from the page frame allocator, and set it as used */
 void *pfa_get_page(void) {
-  for (size_t i = 0; i < 0x100000000/0x1000; i++) {
+  for (size_t i = 0; i < ARRLEN(bitmap); i++) {
     if (bitmap[i] == 0xff) continue;
     for (size_t j = 0; j < sizeof(u32); j++) {
-      if (bitmap[i] & (1 << j)) {
-        bitmap[i] &= ~(1 << j);
+      if (!(bitmap[i] & (1 << j))) {
+        bitmap[i] |= 1 << j;
         return (void*)(i*0x1000*sizeof(u32) + j*0x1000);
       }
     }
@@ -80,5 +82,5 @@ void pfa_free_page(void *page) {
   size_t page_index = (u64)page / 0x1000;
   size_t i = page_index / sizeof(u32);
   size_t j = page_index % sizeof(u32);
-  bitmap[i] |= 1 << j;
+  bitmap[i] &= ~(1 << j);
 }
