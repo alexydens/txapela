@@ -6,6 +6,7 @@
 #include <sys/sse.h>
 #include <sys/segmentation.h>
 #include <sys/interrupts.h>
+#include <mem/pfa.h>
 
 /* The requests start marker */
 __section(".requests_start")
@@ -32,6 +33,13 @@ static volatile struct limine_firmware_type_request firmware_type_request = {
 __section(".requests")
 static volatile struct limine_framebuffer_request framebuffer_request = {
   .id = LIMINE_FRAMEBUFFER_REQUEST,
+  .revision = 0,
+  .response = NULL
+};
+/* The memory map request */
+__section(".requests")
+static volatile struct limine_memmap_request memmap_request = {
+  .id = LIMINE_MEMMAP_REQUEST,
   .revision = 0,
   .response = NULL
 };
@@ -122,8 +130,14 @@ void kmain(void) {
     __asm__ __volatile__ ("hlt");
   }
   tty_printf("===> Initialized interrupts\r\n");
-
-  kpanic("Oh dear! %d", 42);
+  /* Initialize page frame allocator */
+  if (!pfa_init(
+        memmap_request.response->entries,
+        memmap_request.response->entry_count
+      )) {
+    __asm__ __volatile__ ("hlt");
+  }
+  tty_printf("===> Initialized page frame allocator\r\n");
 
   while (1);
   __asm__ __volatile__ ("cli;hlt");

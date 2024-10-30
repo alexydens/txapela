@@ -28,7 +28,7 @@ static char interrupt_names[256][32] = {
   "MACHINE CHECK",
   "SIMD FLOATING POINT NUMERIC ERR"
 };
-static interrupt_handler interrupt_handlers[256];
+static interrupt_handler_t interrupt_handlers[256];
 static struct buffer interrupt_data[256];
 static struct idt_entry {
   u16 offset_low;
@@ -80,6 +80,20 @@ void isr_handler_common(struct isr_args *args) {
         interrupt_names[args->interrupt_number]
     );
   }
+}
+/* The page fault handler */
+void isr_page_fault_handler(struct buffer data, struct isr_args *args) {
+  u64 addr;
+  __asm__ __volatile__ ("mov %%cr2,%0" : "=r" (addr));
+  tty_printf(
+      "PAGE FAULT: %s process tried to %s to a %s page at 0x%08x%08x\r\n",
+      args->error_code & 0x4 ? "User" : "Supervisor",
+      args->error_code & 0x2 ? "read" : "write",
+      args->error_code & 0x1 ? "present" : "non-present",
+      addr
+  );
+  __asm__ __volatile__ ("cli; hlt");
+  (void)data;
 }
 
 /* Interrupt service routines */
@@ -180,6 +194,18 @@ bool interrupts_init(void) {
   /* Enable interrupts */
   __asm__ __volatile__ ("sti");
 
+  /* Add the page fault handler */
+  struct buffer page_fault_data = {
+    .ptr = NULL,
+    .size = 0
+  };
+  interrupt_add_handler(
+      14,
+      "Page fault",
+      isr_page_fault_handler,
+      page_fault_data
+  );
+
   return true;
 }
 
@@ -190,7 +216,7 @@ bool interrupts_init(void) {
 void interrupt_add_handler(
     u32 interrupt_number,
     const char *name,
-    interrupt_handler handler,
+    interrupt_handler_t handler,
     struct buffer data
 ) {
   if (interrupt_number >= 256) {

@@ -67,6 +67,11 @@ void tty_putc(char c) {
         (u32*)_fb->ptr + (u32)(_fb->width * scale_y),
         (u32)((TTY_ROWS-1) * _fb->width * scale_y) * sizeof(u32)
     );
+    for (size_t i = 0; i < (u32)(_fb->width * scale_y); i++) {
+      volatile u32 *ptr = (u32*)_fb->ptr
+        + (u32)(_fb->width * scale_y) * (TTY_ROWS-1);
+      ptr[i] = COL_BACKGROUND;
+    }
   }
 
   /* Find position */

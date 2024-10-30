@@ -19,7 +19,7 @@ struct isr_args {
   u64 rip, cs, rflags, rsp, ss;
 } __packed;
 /* An interrupt handler */
-typedef void (*interrupt_handler)(struct buffer data, struct isr_args *args);
+typedef void (*interrupt_handler_t)(struct buffer data, struct isr_args *args);
 /*
  * Add an interrupt handler:
  * - The name will be cut short if over 32 characters.
@@ -27,7 +27,7 @@ typedef void (*interrupt_handler)(struct buffer data, struct isr_args *args);
 extern void interrupt_add_handler(
     u32 interrupt_number,
     const char *name,
-    interrupt_handler handler,
+    interrupt_handler_t handler,
     struct buffer data
 );
 

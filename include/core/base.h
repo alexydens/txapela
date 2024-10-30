@@ -131,6 +131,8 @@ struct buffer {
 /* MISC */
 /* A null pointer */
 #define NULL               ((void*)0)
+/* Size of a page */
+#define PAGE_SIZE          0x1000
 
 /* FUNCTIONS REQUIRED BY COMPILER */
 /* Memset */
