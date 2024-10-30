@@ -3,7 +3,7 @@
 #include <core/base.h>
 #include <core/panic.h>
 #include <io/tty.h>
-#include <sys/simd.h>
+#include <sys/sse.h>
 #include <sys/segmentation.h>
 #include <sys/interrupts.h>
 #include <mem/pfa.h>
@@ -80,8 +80,8 @@ void kmain(void) {
     __asm__ __volatile__ ("hlt");
   }
 
-  /* Enable SIMD */
-  if (!simd_init()) {
+  /* Enable SSE */
+  if (!sse_init()) {
     __asm__ __volatile__ ("hlt");
   }
 
