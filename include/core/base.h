@@ -136,19 +136,19 @@ struct buffer {
 
 /* FUNCTIONS REQUIRED BY COMPILER */
 /* Memset */
-static inline void *memset(void *dst, u8 val, size_t size) {
+static inline void *memset(void *dst, u8 val, size_t n) {
   size_t i;
   if (!dst) return NULL;
-  if (!size) return dst;
-  for (i = 0; i < size; i++) ((u8 *)dst)[i] = val;
+  if (!n) return dst;
+  for (i = 0; i < n; i++) ((u8 *)dst)[i] = val;
   return dst;
 }
 /* Memcpy */
-static inline void *memcpy(void *dst, const void *src, size_t size) {
+static inline void *memcpy(void *dst, const void *src, size_t n) {
   size_t i;
   if (!dst || !src) return NULL;
-  if (!size) return dst;
-  for (i = 0; i < size; i++) ((u8 *)dst)[i] = ((u8 *)src)[i];
+  if (!n) return dst;
+  for (i = 0; i < n; i++) ((u8 *)dst)[i] = ((u8 *)src)[i];
   return dst;
 }
 /* Strlen */
@@ -159,22 +159,22 @@ static inline u32 strlen(const char *str) {
   return len;
 }
 /* Memmove */
-static inline void *memmove(void *dest, const void *src, size_t n) {
-  u8 *pdest = (u8 *)dest;
+static inline void *memmove(void *dst, const void *src, size_t n) {
+  u8 *pdst = (u8 *)dst;
   const u8 *psrc = (const u8 *)src;
   size_t i;
 
-  if (src > dest) {
+  if (src > dst) {
     for (i = 0; i < n; i++) {
-      pdest[i] = psrc[i];
+      pdst[i] = psrc[i];
     }
   } else {
     for (i = n; i > 0; i--) {
-      pdest[i - 1] = psrc[i - 1];
+      pdst[i - 1] = psrc[i - 1];
     }
   }
 
-  return dest;
+  return dst;
 }
 /* Memcmp */
 static inline int memcmp(const void *s1, const void *s2, size_t n) {
