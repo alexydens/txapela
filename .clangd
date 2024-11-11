@@ -1,0 +1,7 @@
+CompileFlags:
+  Add: 
+    - -std=c11
+    - -Wall
+    - -Wextra
+    - -Wpedantic
+    - -I/home/alexydens/dev/txapela/include

@@ -1,4 +1,4 @@
-# Txapela, another kernel
+# Txapela, operating system kernel
 ## Usage
 - `make tx-toolchain`: build the toolchain (compiles `gcc`, `binutils` and `bochs`
 from source, so may take some time. The toolchain is required for utilities that
@@ -22,3 +22,10 @@ and the toolchain.
 - `iso/`: the root directory of the ISO image.
 ### From test:
 - `log/`: log files.
+## Include directory structure
+- `include/ext`: headers that aren't written for the kernel specifically.
+- `include/base`: some basic utilities and types, used everywhere.
+- `include/fs`: the file system.
+- `include/mem`: memory management.
+- `include/dev`: the device drivers.
+- `include/tx`: most of the kernel.

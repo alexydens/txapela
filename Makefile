@@ -40,10 +40,10 @@ LD=$(TOOLCHAIN_DIR)/x86_64-elf/cross/bin/x86_64-elf-ld
 CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -Werror
 CFLAGS += -I$(INC_DIR)/
 CFLAGS += -ffreestanding
-CFLAGS += -fno-stack-protector -fno-stack-ckeck -fno-PIC
+CFLAGS += -fno-stack-protector -fno-stack-check -fno-PIC
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -mno-80387
-CFLAGS += -mno-mmx -mno-see -mno-sse2
+CFLAGS += -mno-mmx -mno-sse -mno-sse2
 CFLAGS += -mno-red-zone
 CFLAGS += -mcmodel=kernel
 
@@ -74,7 +74,7 @@ $(BIN_DIR)/txapela: $(OBJECTS) | $(OBJ_DIR) $(BIN_DIR) $(TOOLCHAIN_DIR)
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $@
 
 # Iso image
-$(BIN_DIR)/txapela.iso: $(BIN_DIR)/txapela
+$(BIN_DIR)/txapela.iso: $(BIN_DIR)/txapela $(LIMINE_DIR)
 	mkdir -p $(ISO_DIR)/boot/limine
 	mkdir -p $(ISO_DIR)/EFI/BOOT
 	cp -v $(BIN_DIR)/txapela $(ISO_DIR)/boot
@@ -86,10 +86,10 @@ $(BIN_DIR)/txapela.iso: $(BIN_DIR)/txapela
 		$(ISO_DIR)/boot/limine
 	cp -v $(LIMINE_DIR)/BOOTX64.EFI $(ISO_DIR)/EFI/BOOT/BOOTX64.EFI
 	cp -v $(LIMINE_DIR)/BOOTIA32.EFI $(ISO_DIR)/EFI/BOOT/BOOTIA32.EFI
-	xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
-		-no-emul-boot -boot-load-size 4 -boot-info-table \
-		--efi-boot boot/limine/limine-uefi-cd.bin \
-		-efi-boot-part --efi-boot-image --proctive-msdos-label \
+	xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin      \
+		-no-emul-boot -boot-load-size 4 -boot-info-table         \
+		--efi-boot boot/limine/limine-uefi-cd.bin                \
+		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISO_DIR) -o $(BIN_DIR)/txapela.iso
 	$(LIMINE_DIR)/limine bios-install $(BIN_DIR)/txapela.iso
 
@@ -113,7 +113,7 @@ $(LIMINE_DIR):
 
 build: $(BIN_DIR)/txapela.iso
 
-test: $(BIN_DIR)/txapela.iso
+test: $(BIN_DIR)/txapela.iso | $(LOG_DIR)
 	$(BOCHS) -qf $(CONF_DIR)/bochsrc.txt
 
 clean:
