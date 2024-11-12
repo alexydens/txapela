@@ -1,7 +1,11 @@
 CompileFlags:
   Add: 
+    - -xc
     - -std=c11
     - -Wall
     - -Wextra
     - -Wpedantic
     - -I/home/alexydens/dev/txapela/include
+    - -nostdinc
+    - -nostdlib
+    - -ffreestanding

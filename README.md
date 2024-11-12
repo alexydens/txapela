@@ -24,7 +24,7 @@ and the toolchain.
 - `log/`: log files.
 ## Include directory structure
 - `include/ext`: headers that aren't written for the kernel specifically.
-- `include/base`: some basic utilities and types, used everywhere.
+- `include/core`: some basic utilities and types, used everywhere.
 - `include/fs`: the file system.
 - `include/mem`: memory management.
 - `include/dev`: the device drivers.

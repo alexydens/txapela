@@ -43,7 +43,8 @@ CFLAGS += -ffreestanding
 CFLAGS += -fno-stack-protector -fno-stack-check -fno-PIC
 CFLAGS += -ffunction-sections -fdata-sections
 CFLAGS += -mno-80387
-CFLAGS += -mno-mmx -mno-sse -mno-sse2
+#CFLAGS += -mno-mmx -mno-sse -mno-sse2
+CFLAGS += -mno-mmx
 CFLAGS += -mno-red-zone
 CFLAGS += -mcmodel=kernel
 
