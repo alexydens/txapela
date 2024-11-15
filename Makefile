@@ -16,14 +16,14 @@ OVMF_DIR=ovmf
 
 # Toolchain
 TARGET=x86_64-limine
-#TARGET=rv64-limine
+#TARGET=riscv64-limine
 #TARGET=aarch64-limine
 LINKER_SCRIPT=$(CONF_DIR)/linker-$(TARGET).ld
 ifeq ($(TARGET),x86_64-limine)
 	TARGET_TRIPLE=x86_64-unknown-elf
 	ARCH=x86_64
 endif
-ifeq ($(TARGET),rv64-limine)
+ifeq ($(TARGET),riscv64-limine)
 	TARGET_TRIPLE=riscv64-unknown-elf
 	ARCH=riscv64
 endif
@@ -74,7 +74,7 @@ ifeq ($(TARGET),x86_64-limine)
 	CFLAGS += -mcmodel=kernel
 	LDFLAGS += -m elf_x86_64
 endif
-ifeq ($(TARGET),rv64-limine)
+ifeq ($(TARGET),riscv64-limine)
 	CFLAGS += -DTX_TARGET_RV64_LIMINE
 	CFLAGS += -march=rv64imac
 	CFLAGS += -mabi=lp64
@@ -139,7 +139,7 @@ ifeq ($(TARGET),x86_64-limine)
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISO_DIR) -o $(BIN_DIR)/txapela.iso
 endif
-ifeq ($(TARGET),rv64-limine)
+ifeq ($(TARGET),riscv64-limine)
 	cp -v $(LIMINE_DIR)/limine-uefi-cd.bin $(ISO_DIR)/boot/limine/
 	cp -v $(LIMINE_DIR)/BOOTRISCV64.EFI $(ISO_DIR)/EFI/BOOT/
 	xorriso -as mkisofs -R -r -J \
@@ -185,7 +185,7 @@ ifeq ($(TARGET),x86_64-limine)
 		-chardev stdio,id=char0,logfile=$(LOG_DIR)/serial_com1.log,signal=off \
 		-serial chardev:char0
 endif
-ifeq ($(TARGET),rv64-limine)
+ifeq ($(TARGET),riscv64-limine)
 	qemu-system-riscv64 \
 		-machine virt \
 		-cpu rv64 \
@@ -218,6 +218,4 @@ clean:
 	rm -rf $(ISO_DIR)
 	rm -rf $(LOG_DIR)
 	rm -rf $(OVMF_DIR)
-
-full-clean: clean
 	rm -rf $(LIMINE_DIR)
