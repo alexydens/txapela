@@ -53,6 +53,7 @@ LD=ld.lld
 
 # Compiler flags
 CFLAGS = -std=c11 -Wall -Wextra -Wpedantic -Werror
+CFLAGS += -nostdinc
 CFLAGS += -I$(INC_DIR)/
 CFLAGS += -ffreestanding
 CFLAGS += -fno-stack-protector -fno-stack-check
