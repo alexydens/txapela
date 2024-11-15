@@ -268,12 +268,13 @@ void _printf(void (*_putc)(char), const char *format, ...) {
         case 'f':
           ptr++;
           /* Print float */
-          arg.real = va_arg(args, f64);
+          //arg.real = va_arg(args, f64);
+          arg.sint = va_arg(args, i64);
           /* 
              I cannot be bothered to implement this - I don't see myself ever
            * needing to use it.
            */
-          _printf(_putc, "%d", (i32)arg.real);
+          _printf(_putc, "%d", (i32)arg.sint);
           break;
         case 'c':
           ptr++;

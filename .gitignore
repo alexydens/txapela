@@ -4,7 +4,7 @@
 .vscode
 
 # Other
-tx-toolchain
+ovmf
 limine
 obj
 bin

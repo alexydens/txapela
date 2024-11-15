@@ -30,8 +30,9 @@ static volatile struct limine_framebuffer_request limine_framebuffer_request = {
 
 /* Halt execution */
 static inline void halt(void) {
-  __asm__ __volatile__ ("xchg %bx, %bx");
-  while (1) __asm__ __volatile__ ("hlt");
+  //__asm__ __volatile__ ("xchg %bx, %bx");
+  //while (1) __asm__ __volatile__ ("hlt");
+  while (1);
 }
 
 /* Entry point */
