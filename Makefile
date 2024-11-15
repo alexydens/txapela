@@ -218,5 +218,7 @@ clean:
 	rm -rf $(BIN_DIR)
 	rm -rf $(ISO_DIR)
 	rm -rf $(LOG_DIR)
+
+full-clean:
 	rm -rf $(OVMF_DIR)
 	rm -rf $(LIMINE_DIR)

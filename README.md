@@ -3,6 +3,7 @@
 - `make build`: build the kernel iso image, stored in `bin/txapela.iso`.
 - `make test`: test the kernel using the `qemu` emulator.
 - `make clean`: clean the directory of generated files.
+- `make full-clean`: clean the directory to the state at clone.
 ### Specifying a target
 - NOTE: for the `build` and `test` rules, you can specify a target.
 - The following syntax is used: `make <build/test> TARGET="<target>"`.
