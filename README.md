@@ -28,4 +28,5 @@ and the toolchain.
 - `include/fs`: the file system.
 - `include/mem`: memory management.
 - `include/dev`: the device drivers.
+- `include/int`: the interrupt handling.
 - `include/tx`: most of the kernel.
