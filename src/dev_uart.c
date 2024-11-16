@@ -35,6 +35,9 @@ const u16 UART_COM_PORTS[] = {
 #endif
 /* Specific to riscv64 */
 #if defined(__arch_riscv64__)
+/* Includes */
+#include <arch/riscv64/mmio.h>
+
 /* Consts */
 volatile u8 * const UART_COM_ADDRS[] = {
   (volatile u8 *)0x10000000,
@@ -59,6 +62,9 @@ extern struct limine_hhdm_request limine_hhdm_request;
 #endif
 /* Specific to aarch64 */
 #if defined(__arch_aarch64__)
+/* Includes */
+#include <arch/aarch64/mmio.h>
+
 /* Consts */
 volatile u8 * const UART_COM_ADDRS[] = {
   (volatile u8 *)0x09000000,
@@ -74,7 +80,6 @@ volatile u8 * const UART_COM_ADDRS[] = {
 #if defined(__boot_limine__)
 /* Includes */
 #include <ext/limine.h>
-#include <arch/aarch64/mmio.h>
 
 /* Request */
 extern struct limine_hhdm_request limine_hhdm_request;
@@ -113,12 +118,12 @@ bool uart_com_init(enum uart_com_port port) {
   volatile u8 *addr = UART_COM_ADDRS[port];
   addr += limine_hhdm_request.response->offset;
   u16 divisor = 0x0001;
-  mmio_write(addr+LINE_CONTROL_PORT, 0x80);
-  mmio_write(addr+DIVISOR_LOW_PORT, divisor & 0xff);
-  mmio_write(addr+DIVISOR_HIGH_PORT, (divisor >> 8) & 0xff);
-  mmio_write(addr+LINE_CONTROL_PORT, 0x03);
-  mmio_write(addr+FIFO_CONTROL_PORT, 0xC7);
-  mmio_write(addr+MODEM_CONTROL_PORT, 0x0B);
+  mmio_writeb(addr+LINE_CONTROL_PORT, 0x80);
+  mmio_writeb(addr+DIVISOR_LOW_PORT, divisor & 0xff);
+  mmio_writeb(addr+DIVISOR_HIGH_PORT, (divisor >> 8) & 0xff);
+  mmio_writeb(addr+LINE_CONTROL_PORT, 0x03);
+  mmio_writeb(addr+FIFO_CONTROL_PORT, 0xC7);
+  mmio_writeb(addr+MODEM_CONTROL_PORT, 0x0B);
   return true;
 #endif
 }
@@ -134,15 +139,15 @@ bool uart_com_putc(enum uart_com_port port, char c) {
 #if defined(__arch_riscv64__)
   volatile u8 *addr = UART_COM_ADDRS[port];
   addr += limine_hhdm_request.response->offset;
-  while (!(addr[LINE_STATUS_PORT] & 0x20));
-  addr[DATA_PORT] = c;
+  while (!(mmio_readb(addr+LINE_STATUS_PORT) & 0x20));
+  mmio_writeb(addr+DATA_PORT, c);
   return true;
 #endif
 #if defined(__arch_aarch64__)
   volatile u8 *addr = UART_COM_ADDRS[port];
   addr += limine_hhdm_request.response->offset;
-  //while (!(mmio_read(addr+LINE_STATUS_PORT) & 0x20));
-  mmio_write(addr+DATA_PORT, c);
+  //while (!(mmio_readb(addr+LINE_STATUS_PORT) & 0x20));
+  mmio_writeb(addr+DATA_PORT, c);
   return true;
 #endif
 }
@@ -164,14 +169,14 @@ char uart_com_getc(enum uart_com_port port) {
 #if defined(__arch_riscv64__)
   volatile u8 *addr = UART_COM_ADDRS[port];
   addr += limine_hhdm_request.response->offset;
-  if (!(addr[LINE_STATUS_PORT] & 0x01)) return 0;
-  return addr[DATA_PORT];
+  if (!(mmio_readb(addr+LINE_STATUS_PORT) & 0x01)) return 0;
+  return mmio_readb(addr+DATA_PORT);
 #endif
 #if defined(__arch_aarch64__)
   volatile u8 *addr = UART_COM_ADDRS[port];
   addr += limine_hhdm_request.response->offset;
-  //if (!(mmio_read(addr+LINE_STATUS_PORT) & 0x01)) return 0;
-  return mmio_read(addr+DATA_PORT);
+  //if (!(mmio_readb(addr+LINE_STATUS_PORT) & 0x01)) return 0;
+  return mmio_readb(addr+DATA_PORT);
 #endif
 }
 

@@ -1,6 +1,6 @@
 /* Include guard */
-#if !defined(_ARCH_AARCH64_MMIO_H_)
-#define _ARCH_AARCH64_MMIO_H_
+#if !defined(_ARCH_RISCV64_MMIO_H)
+#define _ARCH_RISCV64_MMIO_H
 
 /* Includes */
 #include <core/base.h>
@@ -23,4 +23,4 @@ extern u32 mmio_readl(volatile u32 *addr);
 /* Read a 64 bit value from a MMIO register */
 extern u64 mmio_readq(volatile u64 *addr);
 
-#endif /* _ARCH_AARCH64_MMIO_H_ */
+#endif /* _ARCH_RISCV64_MMIO_H */
