@@ -6,22 +6,22 @@
 
 /* Write an 8 bit value to a MMIO register */
 void mmio_writeb(volatile u8 *addr, u8 val) {
-  *addr = value;
+  *addr = val;
   __asm__ __volatile__ ("dmb ish" ::: "memory");
 }
 /* Write a 16 bit value to a MMIO register */
 void mmio_writes(volatile u16 *addr, u16 val) {
-  *addr = value;
+  *addr = val;
   __asm__ __volatile__ ("dmb ish" ::: "memory");
 }
 /* Write a 32 bit value to a MMIO register */
 void mmio_writel(volatile u32 *addr, u32 val) {
-  *addr = value;
+  *addr = val;
   __asm__ __volatile__ ("dmb ish" ::: "memory");
 }
 /* Write a 64 bit value to a MMIO register */
 void mmio_writeq(volatile u64 *addr, u64 val) {
-  *addr = value;
+  *addr = val;
   __asm__ __volatile__ ("dmb ish" ::: "memory");
 }
 

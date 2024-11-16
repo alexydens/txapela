@@ -2,7 +2,6 @@
 #include <arch/riscv64/mmio.h>
 
 #if defined(__arch_riscv64__)
-#endif
 
 /* Write an 8 bit value to a MMIO register */
 void mmio_writeb(volatile u8 *addr, u8 val) {
@@ -45,3 +44,5 @@ u64 mmio_readq(volatile u64 *addr) {
   __asm__ __volatile__ ("fence io, io" ::: "memory");
   return *addr;
 }
+
+#endif
