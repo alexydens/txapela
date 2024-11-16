@@ -179,7 +179,7 @@ $(LIMINE_DIR):
 		--branch=v8.x-binary --depth=1 $(LIMINE_DIR)
 	$(MAKE) -C $(LIMINE_DIR)
 
-.PHONY: clean full-clean build test test-logint
+.PHONY: clean full-clean build test test-logint test-nox
 
 build: $(BIN_DIR)/txapela.iso
 
@@ -212,9 +212,10 @@ ifeq ($(TARGET),aarch64-limine)
 		-cdrom $(BIN_DIR)/txapela.iso \
 		-serial stdio
 endif
+
 test-logint: $(BIN_DIR)/txapela.iso | $(LOG_DIR) $(OVMF_DIR)/ovmf-code-$(ARCH).fd
 ifeq ($(TARGET),x86_64-limine)
-	qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso -m 4096M \
+	qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso \
 		-serial stdio \
 		-d int 2> $(LOG_DIR)/interrupts.log
 endif
@@ -243,6 +244,29 @@ ifeq ($(TARGET),aarch64-limine)
 		-cdrom $(BIN_DIR)/txapela.iso \
 		-serial stdio \
 		-d int 2> $(LOG_DIR)/interrupts.log
+endif
+
+test-nox: $(BIN_DIR)/txapela.iso | $(LOG_DIR) $(OVMF_DIR)/ovmf-code-$(ARCH).fd
+ifeq ($(TARGET),x86_64-limine)
+	qemu-system-x86_64 -nographic \
+		-cdrom $(BIN_DIR)/txapela.iso \
+		#-serial stdio -nographic
+endif
+ifeq ($(TARGET),riscv64-limine)
+	qemu-system-riscv64 -nographic \
+		-machine virt \
+		-cpu rv64 \
+		-drive if=pflash,unit=0,format=raw,file=$(OVMF_DIR)/ovmf-code-$(ARCH).fd,readonly=on \
+		-cdrom $(BIN_DIR)/txapela.iso \
+		#-serial stdio
+endif
+ifeq ($(TARGET),aarch64-limine)
+	qemu-system-aarch64 -nographic \
+		-machine virt \
+		-cpu cortex-a72 \
+		-drive if=pflash,unit=0,format=raw,file=$(OVMF_DIR)/ovmf-code-$(ARCH).fd,readonly=on \
+		-cdrom $(BIN_DIR)/txapela.iso \
+		#-serial stdio
 endif
 
 clean:

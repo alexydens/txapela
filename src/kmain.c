@@ -67,7 +67,9 @@ void kmain(void) {
   /* Check higher half direct map request */
   if (!limine_hhdm_request.response) halt();
   /* Check framebuffer request */
-  if (!limine_framebuffer_request.response) fb_support = false;
+  if (!limine_framebuffer_request.response) halt();
+  if (!limine_framebuffer_request.response->framebuffer_count)
+    fb_support = false;
 
   /* Initialize UART */
   uart_com_init(UART_COM1);

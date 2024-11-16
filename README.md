@@ -2,6 +2,8 @@
 ## Usage
 - `make build`: build the kernel iso image, stored in `bin/txapela.iso`.
 - `make test`: test the kernel using the `qemu` emulator.
+- `make test-logint`: test the kernel using the `qemu` emulator, logging interrupts.
+- `make test-nox`: test the kernel using the `qemu` emulator, without a GUI.
 - `make clean`: clean the directory of generated files.
 - `make full-clean`: clean the directory to the state at clone.
 ### Specifying a target
