@@ -65,7 +65,8 @@ LDFLAGS = -nostdlib -static -z max-page-size=0x1000
 LDFLAGS += -T $(LINKER_SCRIPT)
 
 ifeq ($(TARGET),x86_64-limine)
-	CFLAGS += -DTX_TARGET_X86_64_LIMINE
+	CFLAGS += -D__arch_x86_64__
+	CFLAGS += -D__boot_limine__
 	CFLAGS += -m64
 	CFLAGS += -march=x86-64
 	CFLAGS += -mno-80387
@@ -76,15 +77,17 @@ ifeq ($(TARGET),x86_64-limine)
 	LDFLAGS += -m elf_x86_64
 endif
 ifeq ($(TARGET),riscv64-limine)
-	CFLAGS += -DTX_TARGET_RV64_LIMINE
-	CFLAGS += -march=rv64imac
+	CFLAGS += -D__arch_riscv64__
+	CFLAGS += -D__boot_limine__
+	CFLAGS += -march=rv64imafdcv
 	CFLAGS += -mabi=lp64
 	CFLAGS += -mno-relax
 	LDFLAGS += -m elf64lriscv
 	LDFLAGS += --no-relax
 endif
 ifeq ($(TARGET),aarch64-limine)
-	CFLAGS += -DTX_TARGET_AARCH64_LIMINE
+	CFLAGS += -D__arch_aarch64__
+	CFLAGS += -D__boot_limine__
 	CFLAGS += -mgeneral-regs-only
 	LDFLAGS += -m aarch64elf
 endif
@@ -176,15 +179,14 @@ $(LIMINE_DIR):
 		--branch=v8.x-binary --depth=1 $(LIMINE_DIR)
 	$(MAKE) -C $(LIMINE_DIR)
 
-.PHONY: clean full-clean build test
+.PHONY: clean full-clean build test test-logint
 
 build: $(BIN_DIR)/txapela.iso
 
 test: $(BIN_DIR)/txapela.iso | $(LOG_DIR) $(OVMF_DIR)/ovmf-code-$(ARCH).fd
 ifeq ($(TARGET),x86_64-limine)
 	qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso -m 4096M \
-		-chardev stdio,id=char0,logfile=$(LOG_DIR)/serial_com1.log,signal=off \
-		-serial chardev:char0
+		-serial stdio
 endif
 ifeq ($(TARGET),riscv64-limine)
 	qemu-system-riscv64 \
@@ -196,8 +198,7 @@ ifeq ($(TARGET),riscv64-limine)
 		-device usb-mouse \
 		-drive if=pflash,unit=0,format=raw,file=$(OVMF_DIR)/ovmf-code-$(ARCH).fd,readonly=on \
 		-cdrom $(BIN_DIR)/txapela.iso \
-		-chardev stdio,id=char0,logfile=$(LOG_DIR)/serial_com1.log,signal=off \
-		-serial chardev:char0
+		-serial stdio
 endif
 ifeq ($(TARGET),aarch64-limine)
 	qemu-system-aarch64 \
@@ -209,8 +210,39 @@ ifeq ($(TARGET),aarch64-limine)
 		-device usb-mouse \
 		-drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-$(ARCH).fd,readonly=on \
 		-cdrom $(BIN_DIR)/txapela.iso \
-		-chardev stdio,id=char0,logfile=$(LOG_DIR)/serial_com1.log,signal=off \
-		-serial chardev:char0
+		-serial stdio
+endif
+test-logint: $(BIN_DIR)/txapela.iso | $(LOG_DIR) $(OVMF_DIR)/ovmf-code-$(ARCH).fd
+ifeq ($(TARGET),x86_64-limine)
+	qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso -m 4096M \
+		-serial stdio \
+		-d int 2> $(LOG_DIR)/interrupts.log
+endif
+ifeq ($(TARGET),riscv64-limine)
+	qemu-system-riscv64 \
+		-machine virt \
+		-cpu rv64 \
+		-device ramfb \
+		-device qemu-xhci \
+		-device usb-kbd \
+		-device usb-mouse \
+		-drive if=pflash,unit=0,format=raw,file=$(OVMF_DIR)/ovmf-code-$(ARCH).fd,readonly=on \
+		-cdrom $(BIN_DIR)/txapela.iso \
+		-serial stdio \
+		-d int 2> $(LOG_DIR)/interrupts.log
+endif
+ifeq ($(TARGET),aarch64-limine)
+	qemu-system-aarch64 \
+		-machine virt \
+		-cpu cortex-a72 \
+		-device ramfb \
+		-device qemu-xhci \
+		-device usb-kbd \
+		-device usb-mouse \
+		-drive if=pflash,unit=0,format=raw,file=ovmf/ovmf-code-$(ARCH).fd,readonly=on \
+		-cdrom $(BIN_DIR)/txapela.iso \
+		-serial stdio \
+		-d int 2> $(LOG_DIR)/interrupts.log
 endif
 
 clean:

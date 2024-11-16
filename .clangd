@@ -9,3 +9,5 @@ CompileFlags:
     - -nostdinc
     - -nostdlib
     - -ffreestanding
+    - -D__arch_x86_64__
+    - -D__boot_limine__
