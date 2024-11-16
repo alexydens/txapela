@@ -74,6 +74,7 @@ volatile u8 * const UART_COM_ADDRS[] = {
 #if defined(__boot_limine__)
 /* Includes */
 #include <ext/limine.h>
+#include <arch/aarch64/mmio.h>
 
 /* Request */
 extern struct limine_hhdm_request limine_hhdm_request;
@@ -112,13 +113,12 @@ bool uart_com_init(enum uart_com_port port) {
   volatile u8 *addr = UART_COM_ADDRS[port];
   addr += limine_hhdm_request.response->offset;
   u16 divisor = 0x0001;
-  addr[LINE_CONTROL_PORT] = 0x80;
-  addr[DIVISOR_LOW_PORT] = divisor & 0xff;
-  addr[DIVISOR_HIGH_PORT] = (divisor >> 8) & 0xff;
-  addr[LINE_CONTROL_PORT] = 0x03;
-  addr[FIFO_CONTROL_PORT] = 0xC7;
-  addr[MODEM_CONTROL_PORT] = 0x0B;
-  return true;
+  mmio_write(addr+LINE_CONTROL_PORT, 0x80);
+  mmio_write(addr+DIVISOR_LOW_PORT, divisor & 0xff);
+  mmio_write(addr+DIVISOR_HIGH_PORT, (divisor >> 8) & 0xff);
+  mmio_write(addr+LINE_CONTROL_PORT, 0x03);
+  mmio_write(addr+FIFO_CONTROL_PORT, 0xC7);
+  mmio_write(addr+MODEM_CONTROL_PORT, 0x0B);
   return true;
 #endif
 }
@@ -141,8 +141,8 @@ bool uart_com_putc(enum uart_com_port port, char c) {
 #if defined(__arch_aarch64__)
   volatile u8 *addr = UART_COM_ADDRS[port];
   addr += limine_hhdm_request.response->offset;
-  //while (!(addr[LINE_STATUS_PORT] & 0x20));
-  addr[DATA_PORT] = c;
+  //while (!(mmio_read(addr+LINE_STATUS_PORT) & 0x20));
+  mmio_write(addr+DATA_PORT, c);
   return true;
 #endif
 }
@@ -153,6 +153,26 @@ bool uart_com_puts(enum uart_com_port port, const char *s) {
     s++;
   }
   return true;
+}
+/* Get a character from a COM port (non blocking, 0 if no char) */
+char uart_com_getc(enum uart_com_port port) {
+#if defined(__arch_x86_64__)
+  u16 com = UART_COM_PORTS[port];
+  if (!(port_inb(com + LINE_STATUS_PORT) & 0x01)) return 0;
+  return port_inb(com + DATA_PORT);
+#endif
+#if defined(__arch_riscv64__)
+  volatile u8 *addr = UART_COM_ADDRS[port];
+  addr += limine_hhdm_request.response->offset;
+  if (!(addr[LINE_STATUS_PORT] & 0x01)) return 0;
+  return addr[DATA_PORT];
+#endif
+#if defined(__arch_aarch64__)
+  volatile u8 *addr = UART_COM_ADDRS[port];
+  addr += limine_hhdm_request.response->offset;
+  //if (!(mmio_read(addr+LINE_STATUS_PORT) & 0x01)) return 0;
+  return mmio_read(addr+DATA_PORT);
+#endif
 }
 
 /* Set the default COM port (COM1 on startup) */
@@ -167,4 +187,8 @@ bool uart_def_com_putc(char c) {
 /* Send a NUL-terminated string to the default COM port */
 bool uart_def_com_puts(const char *s) {
   return uart_com_puts(uart_def_com_port, s);
+}
+/* Get a character from the default COM port (non blocking, 0 if no char) */
+char uart_def_com_getc(void) {
+  return uart_com_getc(uart_def_com_port);
 }

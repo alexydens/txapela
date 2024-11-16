@@ -27,6 +27,8 @@ extern bool uart_com_init(enum uart_com_port port);
 extern bool uart_com_putc(enum uart_com_port port, char c);
 /* Send a NUL-terminated string to a COM port */
 extern bool uart_com_puts(enum uart_com_port port, const char *s);
+/* Get a character from a COM port (non-blocking, 0 if no char) */
+extern char uart_com_getc(enum uart_com_port port);
 
 /* Set the default COM port (COM1 on startup) */
 extern bool uart_com_set_def(enum uart_com_port port);
@@ -34,6 +36,8 @@ extern bool uart_com_set_def(enum uart_com_port port);
 extern bool uart_def_com_putc(char c);
 /* Send a NUL-terminated string to the default COM port */
 extern bool uart_def_com_puts(const char *s);
+/* Get a character from the default COM port (non-blocking, 0 if no char) */
+extern char uart_def_com_getc(void);
 
 /* Internal */
 static inline void __uart_def_com_putc_nobool(char c) { uart_def_com_putc(c); }

@@ -79,6 +79,12 @@ void kmain(void) {
     testfb();
   }
 
+  /* Test getc */
+  while (1) {
+    char c = uart_def_com_getc();
+    if (c) uart_def_com_printf(LOG_INFO "Char in: %c.\n", c);
+  }
+
   /* Halt */
   while (1);
   halt();
