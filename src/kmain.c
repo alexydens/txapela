@@ -31,6 +31,7 @@ volatile struct limine_hhdm_request limine_hhdm_request = {
   .revision = 1,
   .response = NULL
 };
+#if defined(__arch_riscv64__) || defined(__arch_aarch64__)
 /* Device tree request */
 __attribute__((used, section(".requests")))
 volatile struct limine_dtb_request limine_dtb_request = {
@@ -38,6 +39,7 @@ volatile struct limine_dtb_request limine_dtb_request = {
   .revision = 1,
   .response = NULL
 };
+#endif
 /* Framebuffer request */
 __attribute__((used, section(".requests")))
 volatile struct limine_framebuffer_request limine_framebuffer_request = {
@@ -68,7 +70,9 @@ void kmain(void) {
   /* Is there framebuffer support? */
   bool fb_support = true;
   /* Is there a device tree provided by the bootloader? */
+#if defined(__arch_riscv64__) || defined(__arch_aarch64__)
   bool dtb_found = true;
+#endif
 
   /* Check base version */
   if (!LIMINE_BASE_REVISION_SUPPORTED) halt();
@@ -77,7 +81,9 @@ void kmain(void) {
   /* Check higher half direct map request */
   if (!limine_hhdm_request.response) halt();
   /* Check device tree request */
+#if defined(__arch_riscv64__) || defined(__arch_aarch64__)
   if (!limine_dtb_request.response) dtb_found = false;
+#endif
   /* Check framebuffer request */
   if (!limine_framebuffer_request.response) halt();
   if (!limine_framebuffer_request.response->framebuffer_count)
@@ -85,6 +91,20 @@ void kmain(void) {
 
   /* Initialize UART */
   uart_com_init(UART_COM1);
+#if defined(__arch_x86_64__)
+  uart_def_com_printf(LOG_INFO "Architecture: x86_64\n");
+#elif defined(__arch_riscv64__)
+  uart_def_com_printf(LOG_INFO "Architecture: riscv64\n");
+#elif defined(__arch_aarch64__)
+  uart_def_com_printf(LOG_INFO "Architecture: aarch64\n");
+#else
+#error "Unrecognized architecture!"
+#endif
+#if defined(__boot_limine__)
+  uart_def_com_printf(LOG_INFO "Bootloader: limine\n");
+#else
+#error "Unrecognized bootloader!"
+#endif
   uart_def_com_printf(LOG_SUCCESS "Initialized UART-16550A.\n");
 
   /* If on x86_64, initialize the GDT */
@@ -95,6 +115,12 @@ void kmain(void) {
     __builtin_unreachable();
   }
   uart_def_com_printf(LOG_SUCCESS "Initialized Global Descriptor Table.\n");
+  uart_def_com_printf(LOG_INFO "GDT Segment Selectors:\n");
+  uart_def_com_printf("\t-> Kernel Code Segment: %#02x.\n", GDT_SEG_KERNEL_CODE);
+  uart_def_com_printf("\t-> Kernel Data Segment: %#02x.\n", GDT_SEG_KERNEL_DATA);
+  uart_def_com_printf("\t-> User Code Segment:   %#02x.\n", GDT_SEG_USER_CODE);
+  uart_def_com_printf("\t-> User Data Segment:   %#02x.\n", GDT_SEG_USER_DATA);
+  uart_def_com_printf("\t-> Task State Segment:  %#02x.\n", GDT_SEG_TSS);
 #endif
 
   /* Test the framebuffer */
@@ -104,12 +130,14 @@ void kmain(void) {
   } else {
     uart_def_com_printf(LOG_INFO "No framebuffer found.\n");
   }
+#if defined(__arch_riscv64__) || defined(__arch_aarch64__)
   /* Check for device tree */
   if (dtb_found) {
     uart_def_com_printf(LOG_INFO "Device tree found.\n");
   } else {
-    uart_def_com_printf(LOG_INFO "No device tree found.\n");
+    uart_def_com_printf(LOG_WARN "No device tree found.\n");
   }
+#endif
 
   /* Test getc */
   while (1) {
