@@ -2,6 +2,7 @@
 #include <core/base.h>
 #include <core/log.h>
 #include <ext/limine.h>
+#include <arch/x86_64/gdt.h>
 #include <dev/uart.h>
 
 /* LIMINE REQUESTS START AND END MARKER */
@@ -27,6 +28,13 @@ volatile struct limine_entry_point_request limine_entry_point_request = {
 __attribute__((used, section(".requests")))
 volatile struct limine_hhdm_request limine_hhdm_request = {
   .id = LIMINE_HHDM_REQUEST,
+  .revision = 1,
+  .response = NULL
+};
+/* Device tree request */
+__attribute__((used, section(".requests")))
+volatile struct limine_dtb_request limine_dtb_request = {
+  .id = LIMINE_DTB_REQUEST,
   .revision = 1,
   .response = NULL
 };
@@ -59,6 +67,8 @@ void kmain(void) {
   /* Variables */
   /* Is there framebuffer support? */
   bool fb_support = true;
+  /* Is there a device tree provided by the bootloader? */
+  bool dtb_found = true;
 
   /* Check base version */
   if (!LIMINE_BASE_REVISION_SUPPORTED) halt();
@@ -66,6 +76,8 @@ void kmain(void) {
   if (!limine_entry_point_request.response) halt();
   /* Check higher half direct map request */
   if (!limine_hhdm_request.response) halt();
+  /* Check device tree request */
+  if (!limine_dtb_request.response) dtb_found = false;
   /* Check framebuffer request */
   if (!limine_framebuffer_request.response) halt();
   if (!limine_framebuffer_request.response->framebuffer_count)
@@ -75,10 +87,28 @@ void kmain(void) {
   uart_com_init(UART_COM1);
   uart_def_com_printf(LOG_SUCCESS "Initialized UART-16550A.\n");
 
+  /* If on x86_64, initialize the GDT */
+#if defined(__arch_x86_64__)
+  if (!gdt_init()) {
+    uart_def_com_printf(LOG_PANIC "Failed to initialize GDT. Halting...\n");
+    halt();
+    __builtin_unreachable();
+  }
+  uart_def_com_printf(LOG_SUCCESS "Initialized Global Descriptor Table.\n");
+#endif
+
   /* Test the framebuffer */
   if (fb_support) {
     uart_def_com_printf(LOG_INFO "Testing framebuffer.\n");
     testfb();
+  } else {
+    uart_def_com_printf(LOG_INFO "No framebuffer found.\n");
+  }
+  /* Check for device tree */
+  if (dtb_found) {
+    uart_def_com_printf(LOG_INFO "Device tree found.\n");
+  } else {
+    uart_def_com_printf(LOG_INFO "No device tree found.\n");
   }
 
   /* Test getc */

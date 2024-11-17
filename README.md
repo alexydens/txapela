@@ -20,6 +20,7 @@
 - `conf/`: configuration files and linker scripts.
 ### Built once when first cloned
 - `limine/`: the [limine bootloader](https://github.com/limine-bootloader/limine).
+- `ovmf/`: some firmware required by qemu on certain platforms. 
 ### From build
 - `obj/`: object files.
 - `bin/`: binary files.

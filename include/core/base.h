@@ -65,4 +65,10 @@ extern int memcmp(const void *a, const void *b, u32 size);
 /* Strlen */
 extern size_t strlen(const char *str);
 
+/* PACKED AND ALIGNED */
+/* Packed struct */
+#define __packed __attribute__((packed))
+/* Aligned to a certain boundary */
+#define __aligned(x) __attribute__((aligned(x)))
+
 #endif /* _CORE_BASE_H */
