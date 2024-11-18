@@ -31,7 +31,13 @@ volatile struct limine_hhdm_request limine_hhdm_request = {
   .revision = 1,
   .response = NULL
 };
-#if defined(__arch_riscv64__) || defined(__arch_aarch64__)
+/* Root system descriptor table request */
+__attribute__((used, section(".requests")))
+volatile struct limine_rsdp_request limine_rsdp_request = {
+  .id = LIMINE_RSDP_REQUEST,
+  .revision = 1,
+  .response = NULL
+};
 /* Device tree request */
 __attribute__((used, section(".requests")))
 volatile struct limine_dtb_request limine_dtb_request = {
@@ -39,7 +45,6 @@ volatile struct limine_dtb_request limine_dtb_request = {
   .revision = 1,
   .response = NULL
 };
-#endif
 /* Framebuffer request */
 __attribute__((used, section(".requests")))
 volatile struct limine_framebuffer_request limine_framebuffer_request = {
@@ -69,10 +74,10 @@ void kmain(void) {
   /* Variables */
   /* Is there framebuffer support? */
   bool fb_support = true;
+  /* Is there a root system descriptor table provided by the bootloader? */
+  bool rsdp_found = true;
   /* Is there a device tree provided by the bootloader? */
-#if defined(__arch_riscv64__) || defined(__arch_aarch64__)
   bool dtb_found = true;
-#endif
 
   /* Check base version */
   if (!LIMINE_BASE_REVISION_SUPPORTED) halt();
@@ -80,10 +85,10 @@ void kmain(void) {
   if (!limine_entry_point_request.response) halt();
   /* Check higher half direct map request */
   if (!limine_hhdm_request.response) halt();
+  /* Check root system descriptor table request */
+  if (!limine_rsdp_request.response) rsdp_found = false;
   /* Check device tree request */
-#if defined(__arch_riscv64__) || defined(__arch_aarch64__)
   if (!limine_dtb_request.response) dtb_found = false;
-#endif
   /* Check framebuffer request */
   if (!limine_framebuffer_request.response) halt();
   if (!limine_framebuffer_request.response->framebuffer_count)
@@ -130,14 +135,21 @@ void kmain(void) {
   } else {
     uart_def_com_printf(LOG_INFO "No framebuffer found.\n");
   }
-#if defined(__arch_riscv64__) || defined(__arch_aarch64__)
+  
+  /* Check for root system descriptor table */
+  if (rsdp_found) {
+    uart_def_com_printf(LOG_INFO "Root system descriptor table found.\n");
+  } else {
+    uart_def_com_printf(LOG_WARN "No root system descriptor table found.\n");
+  }
+
   /* Check for device tree */
   if (dtb_found) {
     uart_def_com_printf(LOG_INFO "Device tree found.\n");
+    dtb = (u64)limine_dtb_request.response->dtb_ptr;
   } else {
     uart_def_com_printf(LOG_WARN "No device tree found.\n");
   }
-#endif
 
   /* Test getc */
   while (1) {
