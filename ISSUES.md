@@ -4,3 +4,5 @@ to the fact that the MMIO registers can be written to fine, but don't act
 properly when read from, (at least the status ones don't). Because of this, the
 line status register isn't check before read/write on AArch64 architectures,
 however this workaround does introduce some issues.
+- can't currently find device tree. I think I may have to start writing my own
+bootloader.
