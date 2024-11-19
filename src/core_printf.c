@@ -1,5 +1,6 @@
 /* Implements core/printf.h */
 #include <core/printf.h>
+#include <ext/stdarg.h>
 
 /* Consts */
 /* The flags */

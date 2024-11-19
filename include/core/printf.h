@@ -4,7 +4,6 @@
 
 /* Includes */
 #include <core/base.h>
-#include <ext/stdarg.h>
 
 /* Print formatted output using provided putc */
 extern void _printf(void (*_putc)(char), const char *format, ...);
