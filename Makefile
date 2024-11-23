@@ -29,7 +29,7 @@ ifeq ($(TARGET),x86-grub)
 endif
 ifeq ($(TARGET),x86_64-grub)
 	TRIPLE=x86_64-unknown-elf
-	ARCH=x86_64
+	ARCH=x86-64
 	BOOT=multiboot2
 endif
 ifeq ($(TARGET),riscv32-uboot)
@@ -49,7 +49,7 @@ ifeq ($(TARGET),arm-uboot)
 endif
 ifeq ($(TARGET),arm64-uboot)
 	TRIPLE=aarch64-unknown-elf
-	ARCH=arm64
+	ARCH=aarch64
 	BOOT=uboot
 endif
 LINKER_SCRIPT=$(LINK_DIR)/linker-$(TARGET).ld
@@ -84,7 +84,7 @@ endif
 ifeq ($(ARCH),x86_64)
 	CFLAGS += -D__arch_x86_64__
 
-	CFLAGS += -march=x86-64
+	CFLAGS += -march=x86_64
 	CFLAGS += -mcmodel=kernel
 	CFLAGS += -mno-red-zone
 	# It might be better catch no support for these in the kernel itself.
@@ -153,22 +153,22 @@ OBJECTS += $(patsubst $(SRC_DIR)/%.S, $(OBJ_DIR)/%.o, $(ASM_SOURCES))
 
 # Compiling
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	@printf "\tCC\t$<\n"
 	@$(CC) $(CFLAGS) -c $< -o $@
+	@printf "\tCC\t$<\n"
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR) 
-	@printf "\tCXX\t$<\n"
 	@$(CXX) $(CFLAGS) -c $< -o $@
+	@printf "\tCXX\t$<\n"
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.S | $(OBJ_DIR) 
-	@printf "\tAS\t$<\n"
 	@$(AS) $(CFLAGS) -c $< -o $@
+	@printf "\tAS\t$<\n"
 
 # Linking
 $(BIN_DIR)/txapela.elf: $(OBJECTS) | $(OBJ_DIR) $(BIN_DIR) 
+	@$(LD) $(LDFLAGS) $(OBJECTS) -o $@
 	@printf "\tLD\n"
 	@for obj in $(OBJECTS) ; do \
     printf "\t\t$$obj\n" ; \
 	done
-	@$(LD) $(LDFLAGS) $(OBJECTS) -o $@
 
 # Directories
 $(BIN_DIR):
@@ -193,11 +193,8 @@ endif
 test: build
 ifeq ($(TARGET),x86-grub)
 	qemu-system-i386 -cdrom $(BIN_DIR)/txapela.iso
-else ifeq ($(TARGET),x86_64-grub)
-	qemu-system-x86_64 -cdrom $(BIN_DIR)/txapela.iso
 else
-	@echo "ERROR: $(TARGET) Not fully implemented!"
-	@false
+	@echo "TODO: test on $(TARGET)"
 endif
 
 build: $(BIN_DIR)/txapela.iso
