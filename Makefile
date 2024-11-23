@@ -21,8 +21,8 @@ BIN_DIR=bin
 # Default: x86_64-grub
 TARGET=x86_64-grub
 ifeq ($(TARGET),x86-grub)
-	TRIPLE=x86-unknown-elf
-	ARCH=x86
+	TRIPLE=i386-unknown-elf
+	ARCH=i386
 	BOOT=multiboot2
 endif
 ifeq ($(TARGET),x86_64-grub)
@@ -50,7 +50,7 @@ ifeq ($(TARGET),arm64-uboot)
 	ARCH=aarch64
 	BOOT=uboot
 endif
-LINKER_SCRIPT=$(LINK_DIR)/linker-$(ARCH)-$(BOOT).ld
+LINKER_SCRIPT=$(LINK_DIR)/linker-$(TARGET).ld
 CC=clang -target $(TRIPLE)
 AS=clang -target $(TRIPLE)
 CXX=clang++ -target $(TRIPLE)
@@ -72,9 +72,8 @@ ifeq ($(ARCH),x86)
 	CFLAGS += -D__arch_x86__
 
 	CFLAGS += -march=i386
-	CFLAGS += -mcmodel=kernel
-	CFLAGS += -mno-red-zone
-	# It might be better catch no support for these in the kernel itself.
+	CFLAGS += -mcmodel=large
+	CFLAGS += -mno-red-zone # It might be better catch no support for these in the kernel itself.
 	#CFLAGS += -mno-80387
 	#CFLAGS += -mno-mmx -mno-avx -mno-sse -mno-sse2
 
@@ -84,7 +83,7 @@ ifeq ($(ARCH),x86_64)
 	CFLAGS += -D__arch_x86_64__
 
 	CFLAGS += -march=x86_64
-	CFLAGS += -mcmodel=large
+	CFLAGS += -mcmodel=kernel
 	CFLAGS += -mno-red-zone
 	# It might be better catch no support for these in the kernel itself.
 	#CFLAGS += -mno-80387
