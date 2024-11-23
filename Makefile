@@ -22,7 +22,7 @@ BIN_DIR=bin
 TARGET=x86_64-grub
 ifeq ($(TARGET),x86-grub)
 	TRIPLE=i386-unknown-elf
-	ARCH=i386
+	ARCH=x86
 	BOOT=multiboot2
 endif
 ifeq ($(TARGET),x86_64-grub)
@@ -72,7 +72,7 @@ ifeq ($(ARCH),x86)
 	CFLAGS += -D__arch_x86__
 
 	CFLAGS += -march=i386
-	CFLAGS += -mcmodel=large
+	#CFLAGS += -mcmodel=large
 	CFLAGS += -mno-red-zone # It might be better catch no support for these in the kernel itself.
 	#CFLAGS += -mno-80387
 	#CFLAGS += -mno-mmx -mno-avx -mno-sse -mno-sse2
@@ -151,11 +151,14 @@ OBJECTS += $(patsubst $(SRC_DIR)/%.S, $(OBJ_DIR)/%.o, $(ASM_SOURCES))
 
 # Compiling
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@printf "\tCC\t$<\n"
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp | $(OBJ_DIR) 
-	$(CXX) $(CFLAGS) -c $< -o $@
+	@$(CXX) $(CFLAGS) -c $< -o $@
+	@printf "\tCXX\t$<\n"
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.S | $(OBJ_DIR) 
-	$(AS) $(CFLAGS) -c $< -o $@
+	@$(AS) $(CFLAGS) -c $< -o $@
+	@printf "\tAS\t$<\n"
 
 # Linking
 $(BIN_DIR)/txapela.elf: $(OBJECTS) | $(OBJ_DIR) $(BIN_DIR) 
