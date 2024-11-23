@@ -23,9 +23,9 @@ mb2_header_end:
 .align 4
 .globl _start
 _start:
-  mov $('A' | 0xf000), %al
+  mov $('A' | 0xea00), %ax
   mov $0xb8000, %edi
-  mov %al, (%edi)
+  mov %ax, %es:(%edi)
 1:
   hlt
   jmp 1b

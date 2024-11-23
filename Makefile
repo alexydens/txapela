@@ -4,11 +4,13 @@ SHELL=/bin/sh
 # Directories already present
 SRC_DIR=src
 INC_DIR=include
+CONF_DIR=conf
 LINK_DIR=link
 
 # Directories that may not be present
 OBJ_DIR=obj
 BIN_DIR=bin
+ISO_DIR=iso
 
 # Toolchain
 # Available targets:
@@ -162,21 +164,42 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.S | $(OBJ_DIR)
 
 # Linking
 $(BIN_DIR)/txapela.elf: $(OBJECTS) | $(OBJ_DIR) $(BIN_DIR) 
-	$(LD) $(LDFLAGS) $(OBJECTS) -o $@
+	@$(LD) $(LDFLAGS) $(OBJECTS) -o $@
+	@printf "\tLD\n"
+	@for obj in $(OBJECTS) ; do \
+    printf "\t\t$$obj\n" ; \
+	done
 
+# Directories
 $(BIN_DIR):
 	mkdir -p $@
 $(OBJ_DIR):
 	mkdir -p $@
 
+# ISO
+$(BIN_DIR)/txapela.iso: $(BIN_DIR)/txapela.elf
+ifeq ($(BOOT),multiboot2)
+	mkdir -p $(ISO_DIR)/boot/grub
+	cp $(CONF_DIR)/grub.cfg $(ISO_DIR)/boot/grub/grub.cfg
+	cp $(BIN_DIR)/txapela.elf $(ISO_DIR)/boot/txapela.elf
+	grub-mkrescue -o $@ $(ISO_DIR)
+endif
+ifeq ($(BOOT),uboot)
+	@echo "TODO: uboot"
+endif
+
 .PHONY: clean build test
 
 test: build
-	@echo "TODO: test"
+ifeq ($(TARGET),x86-grub)
+	qemu-system-i386 -cdrom $(BIN_DIR)/txapela.iso
+else
+	@echo "TODO: test on $(TARGET)"
+endif
 
-build:
-	@echo "TODO: build"
+build: $(BIN_DIR)/txapela.iso
 
 clean:
 	rm -rf $(OBJ_DIR)
 	rm -rf $(BIN_DIR)
+	rm -rf $(ISO_DIR)
