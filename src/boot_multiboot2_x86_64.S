@@ -1,5 +1,5 @@
-/* Specific to multiboot2 and x86 */
-#if defined(__boot_multiboot2__) && defined(__arch_x86__)
+/* Specific to multiboot2 and x86_64 */
+#if defined(__boot_multiboot2__) && defined(__arch_x86_64__)
 
 .section .multiboot2
 .align 4
